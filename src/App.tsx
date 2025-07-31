@@ -12,20 +12,22 @@ export default function App() {
   const [showLocationForm, setShowLocationForm] = useState(false);
   const [showSwitchgearForm, setShowSwitchgearForm] = useState(false);
 
-  const fetchLocations = async () => {
-    const res = await getAllLocations();
-    const updated = await Promise.all(
-      res.map(async (loc: any) => {
-        const swgs = await getSwitchgearsByLocation(loc.id);
-        return { ...loc, switchgears: swgs };
-      })
-    );
-    setLocations(updated);
-  };
-
   useEffect(() => {
-    fetchLocations();
-  }, []);
+  fetchLocations();
+}, []);
+
+const fetchLocations = async () => {
+  const res = await getAllLocations();
+  const updated = await Promise.all(
+    res.map(async (loc: any) => {
+      const swgs = await getSwitchgearsByLocation(loc.id);
+      return { ...loc, switchgears: swgs };
+    })
+  );
+  console.log("Loaded locations:", updated); // ✅ DEBUG LINE
+  setLocations(updated);
+};
+
 
   return (
     <div className="flex h-screen">
