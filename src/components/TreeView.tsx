@@ -1,40 +1,32 @@
+// src/components/TreeView.tsx
 import React from "react";
 
-interface Switchgear {
-  swgId: number;
-  swgName: string;
+interface TreeViewProps {
+  locations: any[];
+  onLocationClick: (id: number) => void;
 }
 
-interface Location {
-  id: number;
-  locationName: string;
-  switchgears: Switchgear[];
-}
-
-interface Props {
-  locations: Location[];
-  onLocationClick: (locationId: number) => void;
-}
-
-const TreeView: React.FC<Props> = ({ locations, onLocationClick }) => {
+const TreeView: React.FC<TreeViewProps> = ({ locations, onLocationClick }) => {
   return (
-    <div className="space-y-2">
-      {locations.map((loc) => (
-        <div key={loc.id} className="bg-white rounded-xl shadow p-2">
+    <ul className="space-y-2">
+      {locations.map((location) => (
+        <li key={location.id}>
           <button
-            onClick={() => onLocationClick(loc.id)}
-            className="text-blue-700 font-semibold"
+            className="text-left font-semibold text-blue-700 hover:underline"
+            onClick={() => onLocationClick(location.id)}
           >
-            📍 {loc.locationName}
+            📍 {location.locationName}
           </button>
-          <ul className="ml-4 mt-2 list-disc text-sm text-gray-600">
-            {loc.switchgears.map((swg) => (
-              <li key={swg.swgId}>⚡ {swg.swgName}</li>
-            ))}
-          </ul>
-        </div>
+          {location.switchgears?.length > 0 && (
+            <ul className="pl-4 text-sm text-gray-600">
+              {location.switchgears.map((swg: any) => (
+                <li key={swg.swgId}>🔌 {swg.swgName}</li>
+              ))}
+            </ul>
+          )}
+        </li>
       ))}
-    </div>
+    </ul>
   );
 };
 
