@@ -1,111 +1,70 @@
-// src/App.tsx (Updated with TreeView rendering for switchgears)
+// src/components/GraphPanel.tsx
 import React, { useEffect, useState } from "react";
-import TreeView from "./components/TreeView";
-import GraphPanel from "./components/GraphPanel";
-import LocationForm from "./components/LocationForm";
-import SwitchgearForm from "./components/SwitchgearForm";
-import { getAllLocations, getSwitchgearsByLocation } from "./api";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { getGraphData } from "../api";
 
-export default function App() {
-  const [locations, setLocations] = useState<any[]>([]);
-  const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
-  const [showLocationForm, setShowLocationForm] = useState(false);
-  const [showSwitchgearForm, setShowSwitchgearForm] = useState(false);
+interface Props {
+  locationId: number;
+}
 
-  const fetchLocations = async () => {
-    const res = await getAllLocations();
-    const locationList = Array.isArray(res?.data) ? res.data : [];
+const GraphPanel: React.FC<Props> = ({ locationId }) => {
+  const [graphData, setGraphData] = useState<any[]>([]);
 
-    const updated = await Promise.all(
-      locationList.map(async (loc: any) => {
-        const swgs = await getSwitchgearsByLocation(loc.id);
-        return {
-          ...loc,
-          switchgears: Array.isArray(swgs?.data) ? swgs.data : [],
-        };
-      })
-    );
+  const fetchGraph = async () => {
+    const res = await getGraphData(locationId);
+    const result: any[] = [];
+    const raw = res?.data?.data || {};
 
-    setLocations(updated);
+    Object.entries(raw).forEach(([_, day]: any) => {
+      const times = day.solarEnergy.map((entry: any) => entry.time);
+      times.forEach((time: string, i: number) => {
+        result.push({
+          time,
+          solar: day.solarEnergy[i]?.value ?? 0,
+          wind: day.windEnergy[i]?.value ?? 0,
+          total: day.totalEnergy[i]?.value ?? 0,
+          demand: day.demandEnergy[i]?.value ?? 0,
+        });
+      });
+    });
+
+    setGraphData(result);
   };
 
   useEffect(() => {
-    fetchLocations();
-  }, []);
+    fetchGraph();
+  }, [locationId]);
 
   return (
-    <div className="flex h-screen">
-      <div className="w-1/4 bg-gray-100 p-4 overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Locations</h2>
-          <button
-            className="bg-blue-500 text-white text-sm px-3 py-1 rounded"
-            onClick={() => setShowLocationForm(true)}
-          >
-            + Add
-          </button>
-        </div>
-        <TreeView
-          locations={locations}
-          onLocationClick={(id) => setSelectedLocationId(id)}
-        />
-        {selectedLocationId && (
-          <div className="mt-4">
-            <button
-              className="bg-green-600 text-white px-3 py-1 text-sm rounded"
-              onClick={() => setShowSwitchgearForm(true)}
-            >
-              + Add Switchgear
-            </button>
-          </div>
-        )}
-      </div>
-      <div className="flex-1 bg-white p-4 overflow-y-auto">
-        {selectedLocationId ? (
-          <GraphPanel locationId={selectedLocationId} />
-        ) : (
-          <p className="text-gray-500">Select a location to view graphs</p>
-        )}
-      </div>
-
-      {/* Location Modal */}
-      {showLocationForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="w-1/2">
-            <LocationForm onSuccess={() => {
-              setShowLocationForm(false);
-              fetchLocations();
-            }} />
-            <button
-              className="mt-2 text-sm text-gray-600 hover:underline"
-              onClick={() => setShowLocationForm(false)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Switchgear Modal */}
-      {showSwitchgearForm && selectedLocationId && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="w-1/2">
-            <SwitchgearForm
-              locationId={selectedLocationId}
-              onSuccess={() => {
-                setShowSwitchgearForm(false);
-                fetchLocations();
-              }}
-            />
-            <button
-              className="mt-2 text-sm text-gray-600 hover:underline"
-              onClick={() => setShowSwitchgearForm(false)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+    <div>
+      <h2 className="text-lg font-semibold mb-4">Energy Graph</h2>
+      <ResponsiveContainer width="100%" height={400}>
+        <LineChart
+          data={graphData}
+          margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="time" fontSize={10} angle={-45} textAnchor="end" height={60} />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="solar" stroke="#f59e0b" name="Solar" dot={false} />
+          <Line type="monotone" dataKey="wind" stroke="#10b981" name="Wind" dot={false} />
+          <Line type="monotone" dataKey="total" stroke="#3b82f6" name="Total" dot={false} />
+          <Line type="monotone" dataKey="demand" stroke="#ef4444" name="Demand" dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   );
-}
+};
+
+export default GraphPanel;
