@@ -16,41 +16,43 @@ interface Props {
   locationId: number;
 }
 
+interface EnergyData {
+  time: string;
+  solar?: number;
+  wind?: number;
+  total?: number;
+  demand?: number;
+}
+
 const GraphPanel: React.FC<Props> = ({ locationId }) => {
-  const [graphData, setGraphData] = useState<any[]>([]);
+  const [graphData, setGraphData] = useState<EnergyData[]>([]);
 
   const fetchGraph = async () => {
     try {
       const res = await getGraphData(locationId);
       const raw = res?.data?.data || {};
-      const result: any[] = [];
+      const merged: Record<string, EnergyData> = {};
 
       Object.values(raw).forEach((day: any) => {
-        const solar = day?.solarEnergy || [];
-        const wind = day?.windEnergy || [];
-        const total = day?.totalEnergy || [];
-        const demand = day?.demandEnergy || [];
+        const categories = ["solarEnergy", "windEnergy", "totalEnergy", "demandEnergy"];
 
-        for (let i = 0; i < Math.max(solar.length, wind.length, total.length, demand.length); i++) {
-          const time = String(
-            solar[i]?.time ||
-            wind[i]?.time ||
-            total[i]?.time ||
-            demand[i]?.time ||
-            `Hour-${i}`
-          );
-
-          result.push({
-            time,
-            solar: solar[i]?.value ?? 0,
-            wind: wind[i]?.value ?? 0,
-            total: total[i]?.value ?? 0,
-            demand: demand[i]?.value ?? 0,
+        categories.forEach((category) => {
+          const entries = day[category] || [];
+          entries.forEach((item: any) => {
+            const key = item.time;
+            if (!merged[key]) {
+              merged[key] = { time: key };
+            }
+            if (category === "solarEnergy") merged[key].solar = item.value;
+            if (category === "windEnergy") merged[key].wind = item.value;
+            if (category === "totalEnergy") merged[key].total = item.value;
+            if (category === "demandEnergy") merged[key].demand = item.value;
           });
-        }
+        });
       });
 
-      setGraphData(result);
+      const sorted = Object.values(merged).sort((a, b) => a.time.localeCompare(b.time));
+      setGraphData(sorted);
     } catch (error) {
       console.error("Failed to fetch graph data:", error);
       setGraphData([]);
