@@ -26,11 +26,11 @@ const GraphPanel: React.FC<Props> = ({ locationId }) => {
       const result: any[] = [];
 
       Object.values(raw).forEach((day: any) => {
-        const times = day?.solarEnergy?.map((entry: any) => entry.time) || [];
-        times.forEach((time: string, i: number) => {
+        if (!day?.solarEnergy?.length) return;
+        day.solarEnergy.forEach((entry: any, i: number) => {
           result.push({
-            time,
-            solar: day.solarEnergy?.[i]?.value ?? 0,
+            time: entry.time,
+            solar: entry?.value ?? 0,
             wind: day.windEnergy?.[i]?.value ?? 0,
             total: day.totalEnergy?.[i]?.value ?? 0,
             demand: day.demandEnergy?.[i]?.value ?? 0,
