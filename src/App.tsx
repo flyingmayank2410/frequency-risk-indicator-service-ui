@@ -1,4 +1,4 @@
-// src/App.tsx
+// src/App.tsx (Updated with API response fix)
 import React, { useEffect, useState } from "react";
 import TreeView from "./components/TreeView";
 import GraphPanel from "./components/GraphPanel";
@@ -12,22 +12,23 @@ export default function App() {
   const [showLocationForm, setShowLocationForm] = useState(false);
   const [showSwitchgearForm, setShowSwitchgearForm] = useState(false);
 
+  const fetchLocations = async () => {
+    const res = await getAllLocations();
+    const locationList = Array.isArray(res?.data) ? res.data : [];
+
+    const updated = await Promise.all(
+      locationList.map(async (loc: any) => {
+        const swgs = await getSwitchgearsByLocation(loc.id);
+        return { ...loc, switchgears: swgs };
+      })
+    );
+
+    setLocations(updated);
+  };
+
   useEffect(() => {
-  fetchLocations();
-}, []);
-
-const fetchLocations = async () => {
-  const res = await getAllLocations();
-  const updated = await Promise.all(
-    res.map(async (loc: any) => {
-      const swgs = await getSwitchgearsByLocation(loc.id);
-      return { ...loc, switchgears: swgs };
-    })
-  );
-  console.log("Loaded locations:", updated); // ✅ DEBUG LINE
-  setLocations(updated);
-};
-
+    fetchLocations();
+  }, []);
 
   return (
     <div className="flex h-screen">
