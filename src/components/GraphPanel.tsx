@@ -26,16 +26,25 @@ const GraphPanel: React.FC<Props> = ({ locationId }) => {
       const result: any[] = [];
 
       Object.values(raw).forEach((day: any) => {
-        if (!day?.solarEnergy?.length) return;
-        day.solarEnergy.forEach((entry: any, i: number) => {
+        const solar = day?.solarEnergy || [];
+        const wind = day?.windEnergy || [];
+        const total = day?.totalEnergy || [];
+        const demand = day?.demandEnergy || [];
+
+        for (let i = 0; i < solar.length; i++) {
+          const time = solar[i]?.time ||
+            wind[i]?.time ||
+            total[i]?.time ||
+            demand[i]?.time || `Hour-${i}`;
+
           result.push({
-            time: entry.time,
-            solar: entry?.value ?? 0,
-            wind: day.windEnergy?.[i]?.value ?? 0,
-            total: day.totalEnergy?.[i]?.value ?? 0,
-            demand: day.demandEnergy?.[i]?.value ?? 0,
+            time,
+            solar: solar[i]?.value ?? 0,
+            wind: wind[i]?.value ?? 0,
+            total: total[i]?.value ?? 0,
+            demand: demand[i]?.value ?? 0,
           });
-        });
+        }
       });
 
       setGraphData(result);
@@ -65,6 +74,7 @@ const GraphPanel: React.FC<Props> = ({ locationId }) => {
               angle={-45}
               textAnchor="end"
               height={60}
+              tickFormatter={(val) => val.slice(11, 16)}
             />
             <YAxis />
             <Tooltip />
