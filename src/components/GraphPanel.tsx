@@ -1,103 +1,60 @@
 import React, { useEffect, useState } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
 import { getGraphData } from "../api";
-
-interface Props {
-  locationId: number;
-}
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer
+} from "recharts";
 
 interface EnergyData {
   time: string;
-  solar?: number;
-  wind?: number;
-  total?: number;
-  demand?: number;
+  value: number;
 }
 
-const GraphPanel: React.FC<Props> = ({ locationId }) => {
-  const [graphData, setGraphData] = useState<EnergyData[]>([]);
+interface GraphResponse {
+  windEnergy: EnergyData[];
+  solarEnergy: EnergyData[];
+  totalEnergy: EnergyData[];
+}
 
-  const fetchGraph = async () => {
-    try {
-      const res = await getGraphData(locationId);
-      const raw = res?.data?.data || {};
-      const merged: Record<string, EnergyData> = {};
-
-      Object.values(raw).forEach((day: any) => {
-        const categories = ["solarEnergy", "windEnergy", "totalEnergy", "demandEnergy"];
-
-        categories.forEach((category) => {
-          const entries = Array.isArray(day?.[category]) ? day[category] : [];
-          entries.forEach((item: any) => {
-            const key = item?.time;
-            if (!key) return;
-            if (!merged[key]) {
-              merged[key] = { time: key };
-            }
-            if (category === "solarEnergy") merged[key].solar = item.value;
-            if (category === "windEnergy") merged[key].wind = item.value;
-            if (category === "totalEnergy") merged[key].total = item.value;
-            if (category === "demandEnergy") merged[key].demand = item.value;
-          });
-        });
-      });
-
-      const sorted = Object.values(merged).sort((a, b) => a.time.localeCompare(b.time));
-      setGraphData(sorted);
-    } catch (error) {
-      console.error("Failed to fetch graph data:", error);
-      setGraphData([]);
-    }
-  };
+const GraphPanel: React.FC<{ locationId: number }> = ({ locationId }) => {
+  const [data, setData] = useState<GraphResponse | null>(null);
 
   useEffect(() => {
-    if (locationId) fetchGraph();
+    async function fetchData() {
+      const res = await getGraphData(locationId);
+      setData(res);
+    }
+    fetchData();
   }, [locationId]);
 
+  const combineData = () => {
+    if (!data) return [];
+    return data.totalEnergy.map((d, i) => ({
+      time: d.time,
+      total: d.value,
+      wind: data.windEnergy[i]?.value || 0,
+      solar: data.solarEnergy[i]?.value || 0,
+    }));
+  };
+
   return (
-    <div className="mt-6">
-      <h2 className="text-lg font-semibold mb-4">Energy Graph</h2>
-      {graphData.length > 0 ? (
+    <div className="bg-white p-4 rounded-xl shadow">
+      <h3 className="text-lg font-bold mb-4">Energy Graph</h3>
+      {data ? (
         <ResponsiveContainer width="100%" height={400}>
-          <LineChart
-            data={graphData}
-            margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
-          >
+          <LineChart data={combineData()}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="time"
-              fontSize={10}
-              angle={-45}
-              textAnchor="end"
-              height={60}
-              tickFormatter={(val) =>
-                typeof val === "string"
-                  ? val.includes("T")
-                    ? val.slice(11, 16)
-                    : val.slice(11, 16)
-                  : val
-              }
-            />
+            <XAxis dataKey="time" interval={2} angle={-45} textAnchor="end" height={70} />
             <YAxis />
             <Tooltip />
             <Legend />
-            <Line type="monotone" dataKey="solar" stroke="#f59e0b" name="Solar" dot={false} />
-            <Line type="monotone" dataKey="wind" stroke="#10b981" name="Wind" dot={false} />
-            <Line type="monotone" dataKey="total" stroke="#3b82f6" name="Total" dot={false} />
-            <Line type="monotone" dataKey="demand" stroke="#ef4444" name="Demand" dot={false} />
+            <Line type="monotone" dataKey="wind" stroke="#10b981" />
+            <Line type="monotone" dataKey="solar" stroke="#f59e0b" />
+            <Line type="monotone" dataKey="total" stroke="#3b82f6" strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
       ) : (
-        <p className="text-gray-500">No graph data available for this location.</p>
+        <p className="text-gray-500">Loading graph data...</p>
       )}
     </div>
   );

@@ -1,73 +1,105 @@
+// src/App.tsx
 import React, { useEffect, useState } from "react";
 import TreeView from "./components/TreeView";
 import GraphPanel from "./components/GraphPanel";
 import LocationForm from "./components/LocationForm";
 import SwitchgearForm from "./components/SwitchgearForm";
-import { getLocations, getSwitchgears } from "./api";
+import { getAllLocations, getSwitchgearsByLocation } from "./api";
 
-interface Location {
-  id: number;
-  locationName: string;
-}
-
-interface Switchgear {
-  swgId: number;
-  swgName: string;
-  locationId: number;
-}
-
-function App() {
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [switchgears, setSwitchgears] = useState<Switchgear[]>([]);
+export default function App() {
+  const [locations, setLocations] = useState<any[]>([]);
   const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
+  const [showLocationForm, setShowLocationForm] = useState(false);
+  const [showSwitchgearForm, setShowSwitchgearForm] = useState(false);
 
-  const fetchData = async () => {
-    const locRes = await getLocations();
-    if (locRes?.data?.data) {
-      setLocations(locRes.data.data);
-    }
-
-    const swgRes = await Promise.all(
-      locRes.data.data.map((loc: Location) => getSwitchgears(loc.id))
+  const fetchLocations = async () => {
+    const res = await getAllLocations();
+    const updated = await Promise.all(
+      res.map(async (loc: any) => {
+        const swgs = await getSwitchgearsByLocation(loc.id);
+        return { ...loc, switchgears: swgs };
+      })
     );
-
-    const allSwitchgears = swgRes
-      .flatMap((res) => res?.data?.data || [])
-      .map((sg) => ({
-        ...sg,
-        swgId: sg.swgId,
-        swgName: sg.swgName,
-        locationId: sg.locationId,
-      }));
-
-    setSwitchgears(allSwitchgears);
+    setLocations(updated);
   };
 
   useEffect(() => {
-    fetchData();
+    fetchLocations();
   }, []);
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Frequency Risk UI</h1>
-      <div className="grid grid-cols-4 gap-4">
-        <div className="col-span-1">
-          <TreeView
-            locations={locations}
-            switchgears={switchgears}
-            onSelectLocation={setSelectedLocationId}
-          />
+    <div className="flex h-screen">
+      <div className="w-1/4 bg-gray-100 p-4 overflow-y-auto">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Locations</h2>
+          <button
+            className="bg-blue-500 text-white text-sm px-3 py-1 rounded"
+            onClick={() => setShowLocationForm(true)}
+          >
+            + Add
+          </button>
         </div>
-        <div className="col-span-3">
-          <GraphPanel locationId={selectedLocationId ?? 0} />
-          <LocationForm onSuccess={fetchData} />
-          {selectedLocationId && (
-            <SwitchgearForm locationId={selectedLocationId} onSuccess={fetchData} />
-          )}
-        </div>
+        <TreeView
+          locations={locations}
+          onLocationClick={(id) => setSelectedLocationId(id)}
+        />
+        {selectedLocationId && (
+          <div className="mt-4">
+            <button
+              className="bg-green-600 text-white px-3 py-1 text-sm rounded"
+              onClick={() => setShowSwitchgearForm(true)}
+            >
+              + Add Switchgear
+            </button>
+          </div>
+        )}
       </div>
+      <div className="flex-1 bg-white p-4 overflow-y-auto">
+        {selectedLocationId ? (
+          <GraphPanel locationId={selectedLocationId} />
+        ) : (
+          <p className="text-gray-500">Select a location to view graphs</p>
+        )}
+      </div>
+
+      {/* Location Modal */}
+      {showLocationForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="w-1/2">
+            <LocationForm onSuccess={() => {
+              setShowLocationForm(false);
+              fetchLocations();
+            }} />
+            <button
+              className="mt-2 text-sm text-gray-600 hover:underline"
+              onClick={() => setShowLocationForm(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Switchgear Modal */}
+      {showSwitchgearForm && selectedLocationId && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="w-1/2">
+            <SwitchgearForm
+              locationId={selectedLocationId}
+              onSuccess={() => {
+                setShowSwitchgearForm(false);
+                fetchLocations();
+              }}
+            />
+            <button
+              className="mt-2 text-sm text-gray-600 hover:underline"
+              onClick={() => setShowSwitchgearForm(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-export default App;
