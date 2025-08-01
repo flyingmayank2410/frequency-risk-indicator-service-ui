@@ -1,36 +1,27 @@
+// src/api.ts
 import axios from "axios";
 
 const BASE_URL = "https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1";
 
-// 📍 Location APIs
-export const getLocations = async () => {
-  const response = await axios.get(`${BASE_URL}/location/all`);
-  return response.data;
-};
+export const getAllLocations = () =>
+  axios.get(`${BASE_URL}/location/all`);
 
-export const createLocation = async (data: any) => {
-  const response = await axios.post(`${BASE_URL}/location`, data);
-  return response.data;
-};
+export const createLocation = (payload: any) =>
+  axios.post(`${BASE_URL}/location`, payload);
 
-// 🔌 Switchgear APIs
-export const getSwitchgears = async (locationId: number) => {
-  const response = await axios.get(`${BASE_URL}/swg/loc/${locationId}`);
-  return response.data;
-};
+export const updateLocation = (id: number, payload: any) =>
+  axios.put(`${BASE_URL}/location/${id}`, payload);
 
-export const createSwitchgear = async (data: any) => {
-  const response = await axios.post(`${BASE_URL}/swg`, data);
-  return response.data;
-};
+export const getSwitchgearsByLocation = (locationId: number) =>
+  axios.get(`${BASE_URL}/swg/loc/${locationId}`);
 
-// 📈 Graph API
-export const getGraphData = async (locationId: number) => {
-  const response = await axios.get(`${BASE_URL}/graph`, {
-    params: {
-      locationId,
-      days: 3,
-    },
+export const createSwitchgear = (payload: any) =>
+  axios.post(`${BASE_URL}/swg`, payload);
+
+export const updateSwitchgear = (id: number, payload: any) =>
+  axios.put(`${BASE_URL}/swg/${id}`, payload);
+
+export const getGraphData = (locationId: number, days = 3) =>
+  axios.get(`${BASE_URL}/graph`, {
+    params: { locationId, days },
   });
-  return response.data;
-};
