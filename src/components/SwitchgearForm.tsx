@@ -1,12 +1,13 @@
+// src/components/SwitchgearForm.tsx
 import React, { useState } from "react";
 import { createSwitchgear } from "../api";
 
 interface Props {
-  locationId: number;
-  onSave: () => void;
+  locationId: number | null;
+  onRefresh: () => void;
 }
 
-const SwitchgearForm: React.FC<Props> = ({ locationId, onSave }) => {
+const SwitchgearForm: React.FC<Props> = ({ locationId, onRefresh }) => {
   const [form, setForm] = useState({
     swgName: "",
     incomerFeeder: 0,
@@ -22,9 +23,21 @@ const SwitchgearForm: React.FC<Props> = ({ locationId, onSave }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!locationId) {
+      alert("Please select a location first.");
+      return;
+    }
+
     try {
-      await createSwitchgear({ ...form, locationId });
-      onSave();
+      await createSwitchgear({
+        ...form,
+        incomerFeeder: +form.incomerFeeder,
+        outgoingFeeder: +form.outgoingFeeder,
+        activeIncomerFeeder: +form.activeIncomerFeeder,
+        activeOutgoingFeeder: +form.activeOutgoingFeeder,
+        locationId,
+      });
+      alert("Switchgear created successfully");
       setForm({
         swgName: "",
         incomerFeeder: 0,
@@ -32,56 +45,29 @@ const SwitchgearForm: React.FC<Props> = ({ locationId, onSave }) => {
         activeIncomerFeeder: 0,
         activeOutgoingFeeder: 0,
       });
+      onRefresh();
     } catch (error) {
-      console.error("Error creating switchgear", error);
+      alert("Error creating switchgear");
+      console.error(error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-md mt-4">
-      <h3 className="text-md font-semibold mb-2">Add New Switchgear</h3>
-      <input
-        name="swgName"
-        value={form.swgName}
-        onChange={handleChange}
-        placeholder="Switchgear Name"
-        className="w-full border p-2 mb-2"
-        required
-      />
-      <input
-        type="number"
-        name="incomerFeeder"
-        value={form.incomerFeeder}
-        onChange={handleChange}
-        placeholder="Incomer Feeder"
-        className="w-full border p-2 mb-2"
-      />
-      <input
-        type="number"
-        name="outgoingFeeder"
-        value={form.outgoingFeeder}
-        onChange={handleChange}
-        placeholder="Outgoing Feeder"
-        className="w-full border p-2 mb-2"
-      />
-      <input
-        type="number"
-        name="activeIncomerFeeder"
-        value={form.activeIncomerFeeder}
-        onChange={handleChange}
-        placeholder="Active Incomer Feeder"
-        className="w-full border p-2 mb-2"
-      />
-      <input
-        type="number"
-        name="activeOutgoingFeeder"
-        value={form.activeOutgoingFeeder}
-        onChange={handleChange}
-        placeholder="Active Outgoing Feeder"
-        className="w-full border p-2 mb-2"
-      />
-      <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">
-        Add Switchgear
+    <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow space-y-3 mt-4">
+      <h3 className="font-semibold text-md mb-2">Create Switchgear</h3>
+      {["swgName", "incomerFeeder", "outgoingFeeder", "activeIncomerFeeder", "activeOutgoingFeeder"].map((field) => (
+        <input
+          key={field}
+          name={field}
+          placeholder={field}
+          value={(form as any)[field]}
+          onChange={handleChange}
+          className="w-full border px-2 py-1 rounded"
+          required
+        />
+      ))}
+      <button type="submit" className="bg-green-600 text-white px-4 py-1 rounded">
+        Add
       </button>
     </form>
   );
