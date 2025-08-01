@@ -1,4 +1,3 @@
-// src/components/GraphPanel.tsx
 import React, { useEffect, useState } from "react";
 import {
   LineChart,
@@ -37,9 +36,10 @@ const GraphPanel: React.FC<Props> = ({ locationId }) => {
         const categories = ["solarEnergy", "windEnergy", "totalEnergy", "demandEnergy"];
 
         categories.forEach((category) => {
-          const entries = day[category] || [];
+          const entries = Array.isArray(day?.[category]) ? day[category] : [];
           entries.forEach((item: any) => {
-            const key = item.time;
+            const key = item?.time;
+            if (!key) return;
             if (!merged[key]) {
               merged[key] = { time: key };
             }
@@ -64,7 +64,7 @@ const GraphPanel: React.FC<Props> = ({ locationId }) => {
   }, [locationId]);
 
   return (
-    <div>
+    <div className="mt-6">
       <h2 className="text-lg font-semibold mb-4">Energy Graph</h2>
       {graphData.length > 0 ? (
         <ResponsiveContainer width="100%" height={400}>
@@ -79,7 +79,13 @@ const GraphPanel: React.FC<Props> = ({ locationId }) => {
               angle={-45}
               textAnchor="end"
               height={60}
-              tickFormatter={(val) => (typeof val === 'string' ? val.slice(11, 16) : val)}
+              tickFormatter={(val) =>
+                typeof val === "string"
+                  ? val.includes("T")
+                    ? val.slice(11, 16)
+                    : val.slice(11, 16)
+                  : val
+              }
             />
             <YAxis />
             <Tooltip />

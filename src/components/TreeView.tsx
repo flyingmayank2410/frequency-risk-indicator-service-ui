@@ -1,32 +1,41 @@
 import React from "react";
 
-interface TreeProps {
-  data: any[];
-  selectedLocationId: number | null;
-  onSelectLocation: (id: number) => void;
+interface Location {
+  id: number;
+  locationName: string;
 }
 
-const TreeView: React.FC<TreeProps> = ({ data, selectedLocationId, onSelectLocation }) => {
+interface Switchgear {
+  swgId: number;
+  swgName: string;
+  locationId: number;
+}
+
+interface Props {
+  locations: Location[];
+  switchgearMap: Record<number, Switchgear[]>;
+  onSelectLocation: (location: Location) => void;
+}
+
+const TreeView: React.FC<Props> = ({ locations, switchgearMap, onSelectLocation }) => {
   return (
-    <div>
-      {data.map((location) => (
-        <div key={location.id} className="mb-2">
-          <div
-            className={`cursor-pointer font-semibold p-1 ${
-              selectedLocationId === location.id ? "bg-blue-100" : ""
-            }`}
-            onClick={() => onSelectLocation(location.id)}
+    <ul className="space-y-2 text-sm">
+      {locations.map((loc) => (
+        <li key={loc.id}>
+          <button
+            className="font-semibold text-blue-600 hover:underline"
+            onClick={() => onSelectLocation(loc)}
           >
-            {location.locationName}
-          </div>
-          <ul className="ml-4 text-sm text-gray-600">
-            {location.switchgears?.map((swg: any) => (
-              <li key={swg.swgId}>↳ {swg.swgName}</li>
+            📍 {loc.locationName}
+          </button>
+          <ul className="ml-4 mt-1 text-gray-700">
+            {(switchgearMap[loc.id] || []).map((swg) => (
+              <li key={swg.swgId}>🔌 {swg.swgName}</li>
             ))}
           </ul>
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 };
 

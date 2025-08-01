@@ -1,57 +1,96 @@
-// src/components/LocationForm.tsx
 import React, { useState } from "react";
-import axios from "axios";
+import { createLocation } from "../api";
 
 interface Props {
-  onSuccess: () => void;
-  editData?: any;
+  onSave: () => void;
 }
 
-const LocationForm: React.FC<Props> = ({ onSuccess, editData }) => {
+const LocationForm: React.FC<Props> = ({ onSave }) => {
   const [form, setForm] = useState({
-    locationName: editData?.locationName || "",
-    latitude: editData?.latitude || "",
-    longitude: editData?.longitude || "",
-    address: editData?.address || "",
-    windMillCount: editData?.windMillCount || 0,
-    solarPanelCount: editData?.solarPanelCount || 0,
+    locationName: "",
+    latitude: "",
+    longitude: "",
+    address: "",
+    windMillCount: 0,
+    solarPanelCount: 0,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editData) {
-      await axios.put(
-        "https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/location/config",
-        { ...form, id: editData.id }
-      );
-    } else {
-      await axios.post(
-        "https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/location/config",
-        form
-      );
+    try {
+      await createLocation(form);
+      onSave();
+      setForm({
+        locationName: "",
+        latitude: "",
+        longitude: "",
+        address: "",
+        windMillCount: 0,
+        solarPanelCount: 0,
+      });
+    } catch (error) {
+      console.error("Error creating location", error);
     }
-    onSuccess();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 rounded-xl shadow">
-      <h2 className="text-lg font-bold">{editData ? "Edit" : "Create"} Location</h2>
-      {Object.keys(form).map((key) => (
-        <input
-          key={key}
-          name={key}
-          value={(form as any)[key]}
-          onChange={handleChange}
-          placeholder={key}
-          className="w-full p-2 border rounded"
-        />
-      ))}
+    <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-md">
+      <h3 className="text-md font-semibold mb-2">Add New Location</h3>
+      <input
+        name="locationName"
+        value={form.locationName}
+        onChange={handleChange}
+        placeholder="Location Name"
+        className="w-full border p-2 mb-2"
+        required
+      />
+      <input
+        name="latitude"
+        value={form.latitude}
+        onChange={handleChange}
+        placeholder="Latitude"
+        className="w-full border p-2 mb-2"
+        required
+      />
+      <input
+        name="longitude"
+        value={form.longitude}
+        onChange={handleChange}
+        placeholder="Longitude"
+        className="w-full border p-2 mb-2"
+        required
+      />
+      <input
+        name="address"
+        value={form.address}
+        onChange={handleChange}
+        placeholder="Address"
+        className="w-full border p-2 mb-2"
+        required
+      />
+      <input
+        type="number"
+        name="windMillCount"
+        value={form.windMillCount}
+        onChange={handleChange}
+        placeholder="Wind Mill Count"
+        className="w-full border p-2 mb-2"
+      />
+      <input
+        type="number"
+        name="solarPanelCount"
+        value={form.solarPanelCount}
+        onChange={handleChange}
+        placeholder="Solar Panel Count"
+        className="w-full border p-2 mb-2"
+      />
       <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-        {editData ? "Update" : "Create"}
+        Add Location
       </button>
     </form>
   );

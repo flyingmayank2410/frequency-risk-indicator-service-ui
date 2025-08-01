@@ -1,58 +1,87 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { createSwitchgear } from "../api";
 
 interface Props {
   locationId: number;
-  onSuccess: () => void;
-  editData?: any;
+  onSave: () => void;
 }
 
-const SwitchgearForm: React.FC<Props> = ({ locationId, onSuccess, editData }) => {
+const SwitchgearForm: React.FC<Props> = ({ locationId, onSave }) => {
   const [form, setForm] = useState({
-    swgName: editData?.swgName || "",
-    incomerFeeder: editData?.incomerFeeder || 0,
-    outgoingFeeder: editData?.outgoingFeeder || 0,
-    activeIncomerFeeder: editData?.activeIncomerFeeder || 0,
-    activeOutgoingFeeder: editData?.activeOutgoingFeeder || 0,
+    swgName: "",
+    incomerFeeder: 0,
+    outgoingFeeder: 0,
+    activeIncomerFeeder: 0,
+    activeOutgoingFeeder: 0,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = { ...form, locationId };
-
-    if (editData) {
-      await axios.put(
-        "https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/swg/config",
-        { ...payload, swgId: editData.swgId }
-      );
-    } else {
-      await axios.post(
-        "https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/swg/config",
-        payload
-      );
+    try {
+      await createSwitchgear({ ...form, locationId });
+      onSave();
+      setForm({
+        swgName: "",
+        incomerFeeder: 0,
+        outgoingFeeder: 0,
+        activeIncomerFeeder: 0,
+        activeOutgoingFeeder: 0,
+      });
+    } catch (error) {
+      console.error("Error creating switchgear", error);
     }
-    onSuccess();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 rounded-xl shadow">
-      <h2 className="text-lg font-bold">{editData ? "Edit" : "Add"} Switchgear</h2>
-      {Object.keys(form).map((key) => (
-        <input
-          key={key}
-          name={key}
-          value={(form as any)[key]}
-          onChange={handleChange}
-          placeholder={key}
-          className="w-full p-2 border rounded"
-        />
-      ))}
+    <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-md mt-4">
+      <h3 className="text-md font-semibold mb-2">Add New Switchgear</h3>
+      <input
+        name="swgName"
+        value={form.swgName}
+        onChange={handleChange}
+        placeholder="Switchgear Name"
+        className="w-full border p-2 mb-2"
+        required
+      />
+      <input
+        type="number"
+        name="incomerFeeder"
+        value={form.incomerFeeder}
+        onChange={handleChange}
+        placeholder="Incomer Feeder"
+        className="w-full border p-2 mb-2"
+      />
+      <input
+        type="number"
+        name="outgoingFeeder"
+        value={form.outgoingFeeder}
+        onChange={handleChange}
+        placeholder="Outgoing Feeder"
+        className="w-full border p-2 mb-2"
+      />
+      <input
+        type="number"
+        name="activeIncomerFeeder"
+        value={form.activeIncomerFeeder}
+        onChange={handleChange}
+        placeholder="Active Incomer Feeder"
+        className="w-full border p-2 mb-2"
+      />
+      <input
+        type="number"
+        name="activeOutgoingFeeder"
+        value={form.activeOutgoingFeeder}
+        onChange={handleChange}
+        placeholder="Active Outgoing Feeder"
+        className="w-full border p-2 mb-2"
+      />
       <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">
-        {editData ? "Update" : "Create"}
+        Add Switchgear
       </button>
     </form>
   );
