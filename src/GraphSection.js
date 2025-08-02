@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid
+  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from "recharts";
 
-// Turn the per-type arrays for a given day into a single row per hour.
-function makePerHourEnergyData(dayData) {
+// Helper: flatten arrays into per-hour objects for one day
+function makeHourData(dayData) {
   if (!dayData) return [];
-  // Collect all unique times (should be the same for all types, but merge just in case)
   const times = Array.from(
     new Set([
       ...(dayData.solarEnergy || []).map(d => d.time),
@@ -15,21 +14,41 @@ function makePerHourEnergyData(dayData) {
       ...(dayData.demandEnergy || []).map(d => d.time)
     ])
   ).sort();
+  const solar = Object.fromEntries((dayData.solarEnergy || []).map(d => [d.time, d.value]));
+  const wind = Object.fromEntries((dayData.windEnergy || []).map(d => [d.time, d.value]));
+  const total = Object.fromEntries((dayData.totalEnergy || []).map(d => [d.time, d.value]));
+  const demand = Object.fromEntries((dayData.demandEnergy || []).map(d => [d.time, d.value]));
 
-  // Create a map by time for each energy array
-  const solarMap = Object.fromEntries((dayData.solarEnergy || []).map(d => [d.time, d.value]));
-  const windMap = Object.fromEntries((dayData.windEnergy || []).map(d => [d.time, d.value]));
-  const totalMap = Object.fromEntries((dayData.totalEnergy || []).map(d => [d.time, d.value]));
-  const demandMap = Object.fromEntries((dayData.demandEnergy || []).map(d => [d.time, d.value]));
-
-  // Merge all values into one object per time
   return times.map(time => ({
     time,
-    solarEnergy: +solarMap[time] || 0,
-    windEnergy: +windMap[time] || 0,
-    totalEnergy: +totalMap[time] || 0,
-    demandEnergy: +demandMap[time] || 0
+    solarEnergy: +solar[time] || 0,
+    windEnergy: +wind[time] || 0,
+    totalEnergy: +total[time] || 0,
+    demandEnergy: +demand[time] || 0
   }));
+}
+
+function EnergyLineChart({ data, dataKey, color, title, unit }) {
+  return (
+    <div style={{
+      background: "#fff",
+      borderRadius: 8,
+      margin: "16px 0",
+      padding: 20,
+      boxShadow: "0 2px 8px rgba(50,50,50,0.05)"
+    }}>
+      <h4 style={{margin:0, marginBottom:8, color}}>{title}</h4>
+      <ResponsiveContainer width="100%" height={220}>
+        <LineChart data={data}>
+          <XAxis dataKey="time" tick={{fontSize:10}} interval={2} />
+          <YAxis unit={unit || ""} domain={['auto', 'auto']} tick={{fontSize:12}} />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip formatter={v => `${v}${unit || ""}`} />
+          <Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} dot={false} isAnimationActive />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
 }
 
 function GraphSection({ locationId }) {
@@ -42,7 +61,6 @@ function GraphSection({ locationId }) {
       .then(response => {
         if (response && response.data && typeof response.data === "object") {
           setGraph(response.data);
-          // Determine initial selected date (latest key)
           const dates = Object.keys(response.data).sort();
           if (dates.length && !selectedDate) setSelectedDate(dates[dates.length - 1]);
         } else {
@@ -50,23 +68,24 @@ function GraphSection({ locationId }) {
         }
       })
       .catch(() => setGraph(null));
+    // eslint-disable-next-line
   }, [locationId]);
 
   if (!graph) return <div>Loading graph...</div>;
 
   const dateKeys = Object.keys(graph).sort();
-  const data = makePerHourEnergyData(graph[selectedDate]);
+  const data = makeHourData(graph[selectedDate]);
 
   return (
     <div>
       <h3>Energy Graphs for {selectedDate || "Selected Date"}</h3>
-      <div style={{ marginBottom: 12 }}>
+      <div style={{marginBottom:12}}>
         <label>
           Select date:&nbsp;
           <select
             value={selectedDate}
             onChange={e => setSelectedDate(e.target.value)}
-            style={{ fontSize: "1em" }}
+            style={{fontSize:"1em"}}
           >
             {dateKeys.map(date =>
               <option key={date} value={date}>{date}</option>
@@ -77,19 +96,36 @@ function GraphSection({ locationId }) {
       {data.length === 0 ? (
         <div>No data for this date.</div>
       ) : (
-        <ResponsiveContainer width="100%" height={350}>
-          <LineChart data={data} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
-            <XAxis dataKey="time" minTickGap={20} />
-            <YAxis />
-            <CartesianGrid stroke="#eee" strokeDasharray="5 5"/>
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="solarEnergy" stroke="#ff9800" name="Solar Energy" dot={false} />
-            <Line type="monotone" dataKey="windEnergy" stroke="#03a9f4" name="Wind Energy" dot={false} />
-            <Line type="monotone" dataKey="totalEnergy" stroke="#4caf50" name="Total Energy" dot={false} />
-            <Line type="monotone" dataKey="demandEnergy" stroke="#e91e63" name="Demand Energy" dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
+        <>
+          <EnergyLineChart
+            data={data}
+            dataKey="solarEnergy"
+            title="Solar Energy"
+            color="#ff9800"
+            unit=""
+          />
+          <EnergyLineChart
+            data={data}
+            dataKey="windEnergy"
+            title="Wind Energy"
+            color="#03a9f4"
+            unit=""
+          />
+          <EnergyLineChart
+            data={data}
+            dataKey="totalEnergy"
+            title="Total Energy"
+            color="#4caf50"
+            unit=""
+          />
+          <EnergyLineChart
+            data={data}
+            dataKey="demandEnergy"
+            title="Demand Energy"
+            color="#e91e63"
+            unit=""
+          />
+        </>
       )}
     </div>
   );
