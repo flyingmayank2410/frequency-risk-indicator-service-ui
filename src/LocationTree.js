@@ -47,7 +47,7 @@ function LocationTree({ onSelectLocation, onSelectSwitchgear, refresh }) {
                   borderRadius: 2,
                   fontWeight: "bold",
                   fontSize: 12,
-                  color: "#fff"
+                  color: "#fff",
                 }}
                 aria-label={isExpanded ? "Collapse" : "Expand"}
               >
@@ -55,7 +55,11 @@ function LocationTree({ onSelectLocation, onSelectSwitchgear, refresh }) {
               </div>
               <span
                 onClick={() => onSelectLocation(location)}
-                style={{ fontWeight: isExpanded ? "bold" : "normal", color: "#7cb7ff" }}
+                style={{
+                  fontWeight: isExpanded ? "bold" : "normal",
+                  color: "#fff", // SOLID WHITE for location name
+                  fontSize: 15
+                }}
               >
                 {location.locationName}
               </span>
@@ -103,7 +107,7 @@ function SwitchgearBranch({ locationId, onSelectSwitchgear }) {
             padding: "2px 4px",
             borderRadius: 4,
             marginBottom: 2,
-            color: "#bbb",
+            color: "#bbb", // lighter for switchgears
           }}
         >
           {swg.swgName}
