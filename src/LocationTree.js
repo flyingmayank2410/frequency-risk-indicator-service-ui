@@ -57,8 +57,8 @@ function LocationTree({ onSelectLocation, onSelectSwitchgear, refresh }) {
                 onClick={() => onSelectLocation(location)}
                 style={{
                   fontWeight: isExpanded ? "bold" : "normal",
-                  color: "#fff", // SOLID WHITE for location name
-                  fontSize: 15
+                  color: "#fff",
+                  fontSize: 18 // Font bigger for location name
                 }}
               >
                 {location.locationName}
@@ -66,7 +66,10 @@ function LocationTree({ onSelectLocation, onSelectSwitchgear, refresh }) {
             </div>
             {isExpanded && (
               <ul style={{ listStyle: "none", paddingLeft: 24, marginTop: 4 }}>
-                <SwitchgearBranch locationId={location.id} onSelectSwitchgear={onSelectSwitchgear} />
+                <SwitchgearBranch
+                  locationId={location.id}
+                  onSelectSwitchgear={onSelectSwitchgear}
+                />
               </ul>
             )}
           </li>
@@ -107,7 +110,9 @@ function SwitchgearBranch({ locationId, onSelectSwitchgear }) {
             padding: "2px 4px",
             borderRadius: 4,
             marginBottom: 2,
-            color: "#bbb", // lighter for switchgears
+            color: "#fff", // now solid white for child, too
+            fontSize: 16, // slightly smaller than parent
+            fontWeight: 500
           }}
         >
           {swg.swgName}
