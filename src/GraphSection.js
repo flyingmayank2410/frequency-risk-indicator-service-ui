@@ -4,13 +4,14 @@ function GraphSection({ locationId }) {
   const [graph, setGraph] = useState(null);
 
   useEffect(() => {
-    fetch(`https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/graph?locationId=${locationId}&days=3`)
+    fetch(`https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/graph?locationId=${locationId}&days=1`)
       .then(r => r.json())
       .then(setGraph);
   }, [locationId]);
 
   if (!graph) return <div>Loading graph...</div>;
-  // Simplified display, for a complete chart use Chart.js/Recharts and plot graph.totalEnergy, solarEnergy, windEnergy, etc.
+  // For quick reference, simply display the JSON graph data.
+  // For a real chart, pass this data to Recharts/Chart.js.
   return (
     <div>
       <h3>Energy Graph Data</h3>
