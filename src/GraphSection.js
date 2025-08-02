@@ -3,7 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from "recharts";
 
-// Helper: flatten arrays into per-hour objects for one day
+// Helper: flatten arrays into per-hour objects for one day, formatting time to HH:mm
 function makeHourData(dayData) {
   if (!dayData) return [];
   const times = Array.from(
@@ -20,7 +20,7 @@ function makeHourData(dayData) {
   const demand = Object.fromEntries((dayData.demandEnergy || []).map(d => [d.time, d.value]));
 
   return times.map(time => ({
-    time,
+    time: time.includes("T") ? time.split("T")[1].slice(0,5) : time.slice(-8, -3),
     solarEnergy: +solar[time] || 0,
     windEnergy: +wind[time] || 0,
     totalEnergy: +total[time] || 0,
@@ -102,28 +102,28 @@ function GraphSection({ locationId }) {
             dataKey="solarEnergy"
             title="Solar Energy"
             color="#ff9800"
-            unit=""
+            unit=" MW"
           />
           <EnergyLineChart
             data={data}
             dataKey="windEnergy"
             title="Wind Energy"
             color="#03a9f4"
-            unit=""
+            unit=" MW"
           />
           <EnergyLineChart
             data={data}
             dataKey="totalEnergy"
             title="Total Energy"
             color="#4caf50"
-            unit=""
+            unit=" MW"
           />
           <EnergyLineChart
             data={data}
             dataKey="demandEnergy"
             title="Demand Energy"
             color="#e91e63"
-            unit=""
+            unit=" MW"
           />
         </>
       )}
