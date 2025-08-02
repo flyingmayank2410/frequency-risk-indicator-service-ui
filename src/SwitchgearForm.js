@@ -52,15 +52,19 @@ function SwitchgearForm({ switchgear, onRefresh, onBack }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{
-      background: "#fff",
-      borderRadius: 10,
-      boxShadow: "0 2px 8px rgba(50,50,50,0.06)",
-      padding: 24,
-      maxWidth: 380,
-      width: "100%"
-    }}>
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        background: "#fff",
+        borderRadius: 10,
+        boxShadow: "0 2px 8px rgba(50,50,50,0.06)",
+        padding: 24,
+        maxWidth: 380,
+        width: "100%"
+      }}
+    >
       <h3>{isEdit ? "Edit" : "Add"} Switchgear</h3>
+
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="swgName">Switchgear Name</label>
         <input
@@ -72,6 +76,7 @@ function SwitchgearForm({ switchgear, onRefresh, onBack }) {
           style={{ width: "100%" }}
         />
       </div>
+
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="incomerFeeder">Incomer Feeder</label>
         <input
@@ -84,6 +89,7 @@ function SwitchgearForm({ switchgear, onRefresh, onBack }) {
           style={{ width: "100%" }}
         />
       </div>
+
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="outgoingFeeder">Outgoing Feeder</label>
         <input
@@ -96,6 +102,7 @@ function SwitchgearForm({ switchgear, onRefresh, onBack }) {
           style={{ width: "100%" }}
         />
       </div>
+
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="activeIncomerFeeder">Active Incomer Feeder</label>
         <input
@@ -108,8 +115,45 @@ function SwitchgearForm({ switchgear, onRefresh, onBack }) {
           style={{ width: "100%" }}
         />
       </div>
+
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="activeOutgoingFeeder">Active Outgoing Feeder</label>
         <input
           id="activeOutgoingFeeder"
-          name
+          name="activeOutgoingFeeder"
+          type="number"
+          value={form.activeOutgoingFeeder}
+          onChange={handleChange}
+          placeholder="Active Outgoing Feeder"
+          style={{ width: "100%" }}
+        />
+      </div>
+
+      <div style={{ marginBottom: 18 }}>
+        <label htmlFor="locationId">Location ID</label>
+        <input
+          id="locationId"
+          name="locationId"
+          type="number"
+          value={form.locationId}
+          onChange={handleChange}
+          placeholder="Location ID"
+          readOnly={!!switchgear.locationId}
+          style={{
+            width: "100%",
+            backgroundColor: switchgear.locationId ? "#f0f0f0" : "white"
+          }}
+        />
+      </div>
+
+      <button type="submit" style={{ marginRight: 8 }}>
+        {isEdit ? "Update" : "Create"}
+      </button>
+      <button type="button" onClick={onBack}>
+        Back
+      </button>
+    </form>
+  );
+}
+
+export default SwitchgearForm;
