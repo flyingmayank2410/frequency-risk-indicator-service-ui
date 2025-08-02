@@ -1,30 +1,53 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function LocationForm({ location, onRefresh, onAddSwitchgear }) {
   const isEdit = !!location.id;
-  const [form, setForm] = useState(
-    location || {
-      locationName: "", latitude: "", longitude: "", address: "", windMillCount: 0, solarPanelCount: 0
+  const [form, setForm] = useState({
+    locationName: "",
+    latitude: "",
+    longitude: "",
+    address: "",
+    windMillCount: 0,
+    solarPanelCount: 0,
+  });
+
+  useEffect(() => {
+    if (location && location.id) {
+      // Fetch full location details just in case
+      fetch(`https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/location/config/${location.id}`)
+        .then(res => res.json())
+        .then(response => {
+          if (response && response.data && typeof response.data === "object") {
+            setForm(response.data);
+          }
+        })
+        .catch(() => setForm(location));
+    } else if (location) {
+      setForm(location);
     }
-  );
+  }, [location]);
 
   function handleChange(e) {
     setForm(f => ({
       ...f,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   }
 
   function handleSubmit(e) {
     e.preventDefault();
-    fetch(
-      "https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/location/config",
-      {
-        method: isEdit ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
-      }
-    ).then(() => onRefresh());
+    fetch("https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/location/config", {
+      method: isEdit ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    })
+      .then(res => res.json())
+      .then(response => {
+        if (response && response.data && typeof response.data === "object") {
+          onRefresh && onRefresh();
+        }
+      })
+      .catch(() => {});
   }
 
   return (

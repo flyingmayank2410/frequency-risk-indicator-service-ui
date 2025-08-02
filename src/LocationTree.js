@@ -5,8 +5,15 @@ function LocationTree({ onSelectLocation, onSelectSwitchgear, refresh }) {
 
   useEffect(() => {
     fetch("https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/location/all")
-      .then(r => r.json())
-      .then(setLocations);
+      .then(res => res.json())
+      .then(response => {
+        if (response && Array.isArray(response.data)) {
+          setLocations(response.data);
+        } else {
+          setLocations([]);
+        }
+      })
+      .catch(() => setLocations([]));
   }, [refresh]);
 
   return (
@@ -30,7 +37,14 @@ function SwitchgearBranch({ locationId, onSelectSwitchgear }) {
   useEffect(() => {
     fetch(`https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/swg/loc/${locationId}`)
       .then(r => r.json())
-      .then(setSwgs);
+      .then(response => {
+        if (response && Array.isArray(response.data)) {
+          setSwgs(response.data);
+        } else {
+          setSwgs([]);
+        }
+      })
+      .catch(() => setSwgs([]));
   }, [locationId]);
   return (
     <ul>
