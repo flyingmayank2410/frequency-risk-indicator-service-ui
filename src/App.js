@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import LocationTree from "./LocationTree";
 import LocationForm from "./LocationForm";
 import SwitchgearForm from "./SwitchgearForm";
@@ -9,6 +9,8 @@ function App() {
   const [selectedSwitchgear, setSelectedSwitchgear] = useState(null);
   const [showLocationForm, setShowLocationForm] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [panelWidth, setPanelWidth] = useState(320); // initial width in px
+  const dragging = useRef(false);
 
   function handleTreeRefresh() {
     setRefresh(r => !r);
@@ -26,9 +28,50 @@ function App() {
     setSelectedSwitchgear({ locationId: selectedLocation.id });
   }
 
+  // Drag logic for resizing sidebar
+  function startDrag(e) {
+    dragging.current = true;
+    document.body.style.cursor = "ew-resize";
+  }
+  function onDrag(e) {
+    if (dragging.current) {
+      // Support both mouse and touch events
+      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      const newWidth = Math.max(200, Math.min(x, 600));
+      setPanelWidth(newWidth);
+    }
+  }
+  function stopDrag() {
+    dragging.current = false;
+    document.body.style.cursor = "";
+  }
+  React.useEffect(() => {
+    function handleDrag(e) { onDrag(e); }
+    function handleUp() { stopDrag(); }
+    window.addEventListener('mousemove', handleDrag);
+    window.addEventListener('mouseup', handleUp);
+    window.addEventListener('touchmove', handleDrag);
+    window.addEventListener('touchend', handleUp);
+    return () => {
+      window.removeEventListener('mousemove', handleDrag);
+      window.removeEventListener('mouseup', handleUp);
+      window.removeEventListener('touchmove', handleDrag);
+      window.removeEventListener('touchend', handleUp);
+    };
+    // eslint-disable-next-line
+  }, []);
+
   return (
-    <div style={{ display: "flex" }}>
-      <div style={{ width: "30%", borderRight: "1px solid #ddd", padding: 16 }}>
+    <div style={{ display: "flex", height: "100vh" }}>
+      <div style={{
+        width: panelWidth,
+        minWidth: 200,
+        maxWidth: 600,
+        borderRight: "1px solid #ddd",
+        padding: 16,
+        boxSizing: "border-box",
+        background: "#fafbfc"
+      }}>
         <LocationTree
           onSelectLocation={loc => {
             setSelectedLocation(loc);
@@ -46,7 +89,24 @@ function App() {
           + Add Location
         </button>
       </div>
-      <div style={{ width: "70%", padding: 16 }}>
+      {/* Draggable Resizer */}
+      <div
+        onMouseDown={startDrag}
+        onTouchStart={startDrag}
+        style={{
+          width: 6,
+          cursor: "ew-resize",
+          background: "#e1e5ea",
+          zIndex: 10,
+          userSelect: "none"
+        }}
+      />
+      <div style={{
+        flex: 1,
+        padding: 16,
+        overflowY: "auto",
+        background: "#f5f6f8"
+      }}>
         {selectedLocation && !showLocationForm && !selectedSwitchgear && (
           <>
             <div style={{
@@ -74,7 +134,6 @@ function App() {
             <GraphSection locationId={selectedLocation.id} />
           </>
         )}
-
         {showLocationForm && (
           <LocationForm
             location={selectedLocation}
@@ -82,7 +141,6 @@ function App() {
             onAddSwitchgear={handleAddSwitchgear}
           />
         )}
-
         {selectedSwitchgear && (
           <SwitchgearForm
             switchgear={selectedSwitchgear}
