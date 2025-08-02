@@ -98,50 +98,48 @@ function App() {
       </div>
 
       {/* Draggable Resizer with Collapse/Expand */}
-      <div
-        onMouseDown={startDrag}
-        onTouchStart={startDrag}
-        style={{
-          width: 16,
-          cursor: sidebarCollapsed ? "pointer" : "ew-resize",
-          background: "#e1e5ea",
-          zIndex: 10,
-          userSelect: "none",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          borderRight: "1px solid #ccc",
-          position: "relative"
-        }}
-      >
-        <button
-          aria-label={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          onClick={() => setSidebarCollapsed(c => !c)}
-          style={{
-            width: 14,
-            height: 30,
-            border: "none",
-            background: "transparent",
-            cursor: "pointer",
-            fontWeight: 700,
-            fontSize: 17,
-            outline: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "absolute",
-            right: 1, // align to the edge
-            top: "50%",
-            transform: "translateY(-50%)",
-            color: "#444",
-            padding: 0,
-            zIndex: 20
-          }}
-          tabIndex={0}
-        >
-          {sidebarCollapsed ? "»" : "«"}
-        </button>
-      </div>
+      {/* Draggable Resizer with Collapse/Expand at the TOP */}
+<div
+  onMouseDown={startDrag}
+  onTouchStart={startDrag}
+  style={{
+    width: 16,
+    cursor: sidebarCollapsed ? "pointer" : "ew-resize",
+    background: "#e1e5ea",
+    zIndex: 10,
+    userSelect: "none",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    borderRight: "1px solid #ccc",
+    position: "relative"
+  }}
+>
+  <button
+    aria-label={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+    onClick={() => setSidebarCollapsed(c => !c)}
+    style={{
+      width: 14,
+      height: 30,
+      border: "none",
+      background: "transparent",
+      cursor: "pointer",
+      fontWeight: 700,
+      fontSize: 17,
+      outline: "none",
+      marginTop: 2,
+      marginBottom: 4,
+      color: "#444",
+      padding: 0,
+      zIndex: 20
+    }}
+    tabIndex={0}
+  >
+    {sidebarCollapsed ? "»" : "«"}
+  </button>
+  {/* The rest of the bar below is empty for dragging */}
+</div>
+
 
       {/* Main content */}
       <div style={{
