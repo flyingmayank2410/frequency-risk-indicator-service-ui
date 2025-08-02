@@ -9,8 +9,7 @@ function App() {
   const [selectedSwitchgear, setSelectedSwitchgear] = useState(null);
   const [showLocationForm, setShowLocationForm] = useState(false);
   const [refresh, setRefresh] = useState(false);
-
-  const [panelWidth, setPanelWidth] = useState(320); // sidebar width
+  const [panelWidth, setPanelWidth] = useState(320);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const dragging = useRef(false);
 
@@ -19,19 +18,18 @@ function App() {
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
   }
-
   function handleEditLocation() {
     setShowLocationForm(true);
     setSelectedSwitchgear(null);
   }
-
   function handleAddSwitchgear() {
     setShowLocationForm(false);
     setSelectedSwitchgear({ locationId: selectedLocation?.id });
   }
 
-  // Drag for resizing sidebar
+  // Drag logic for resizing sidebar
   function startDrag(e) {
+    if (sidebarCollapsed) return; // don't resize when collapsed
     dragging.current = true;
     document.body.style.cursor = "ew-resize";
     e.preventDefault();
@@ -67,84 +65,83 @@ function App() {
     <div style={{ display: "flex", height: "100vh" }}>
       {/* Sidebar */}
       <div style={{
-        width: sidebarCollapsed ? 28 : panelWidth,
-        minWidth: sidebarCollapsed ? 28 : 200,
-        maxWidth: sidebarCollapsed ? 28 : 600,
-        borderRight: "1px solid #ddd",
+        width: sidebarCollapsed ? 0 : panelWidth,
+        minWidth: sidebarCollapsed ? 0 : 200,
+        maxWidth: sidebarCollapsed ? 0 : 600,
+        borderRight: sidebarCollapsed ? 'none' : "1px solid #ddd",
         padding: sidebarCollapsed ? 0 : 16,
         boxSizing: "border-box",
         background: "#fafbfc",
-        transition: "width 0.2s",
+        transition: "width 0.2s, min-width 0.2s, max-width 0.2s",
         overflow: "hidden",
-        display: "flex",
+        display: sidebarCollapsed ? "none" : "flex",
         flexDirection: "column"
       }}>
-        {/* Collapse button at top */}
-        <div style={{
-          height: 32,
+        <div style={{ flex: 1, overflowY: "auto" }}>
+          <LocationTree
+            onSelectLocation={loc => {
+              setSelectedLocation(loc);
+              setShowLocationForm(false);
+              setSelectedSwitchgear(null);
+            }}
+            onSelectSwitchgear={swg => setSelectedSwitchgear(swg)}
+            refresh={refresh}
+          />
+        </div>
+        <button style={{ marginTop: 10 }} onClick={() => {
+          setSelectedLocation({});
+          setShowLocationForm(true);
+          setSelectedSwitchgear(null);
+        }}>
+          + Add Location
+        </button>
+      </div>
+
+      {/* Draggable Resizer with Collapse/Expand */}
+      <div
+        onMouseDown={startDrag}
+        onTouchStart={startDrag}
+        style={{
+          width: 16,
+          cursor: sidebarCollapsed ? "pointer" : "ew-resize",
+          background: "#e1e5ea",
+          zIndex: 10,
+          userSelect: "none",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          borderBottom: sidebarCollapsed ? "none" : "1px solid #eee"
-        }}>
-          <button
-            aria-label={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-            onClick={() => setSidebarCollapsed(c => !c)}
-            style={{
-              width: 24,
-              height: 24,
-              border: "none",
-              background: "transparent",
-              cursor: "pointer",
-              fontWeight: 700,
-              fontSize: 16,
-              outline: "none",
-              padding: 0,
-              userSelect: "none"
-            }}
-            tabIndex={0}
-          >
-            {sidebarCollapsed ? "»" : "«"}
-          </button>
-        </div>
-        {!sidebarCollapsed && (
-          <>
-            <div style={{ flex: 1, overflowY: "auto" }}>
-              <LocationTree
-                onSelectLocation={loc => {
-                  setSelectedLocation(loc);
-                  setShowLocationForm(false);
-                  setSelectedSwitchgear(null);
-                }}
-                onSelectSwitchgear={swg => setSelectedSwitchgear(swg)}
-                refresh={refresh}
-              />
-            </div>
-            <button style={{ marginTop: 10 }} onClick={() => {
-              setSelectedLocation({});
-              setShowLocationForm(true);
-              setSelectedSwitchgear(null);
-            }}>
-              + Add Location
-            </button>
-          </>
-        )}
-      </div>
-
-      {/* Draggable resizer */}
-      {!sidebarCollapsed && (
-        <div
-          onMouseDown={startDrag}
-          onTouchStart={startDrag}
+          borderRight: "1px solid #ccc",
+          position: "relative"
+        }}
+      >
+        <button
+          aria-label={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          onClick={() => setSidebarCollapsed(c => !c)}
           style={{
-            width: 6,
-            cursor: "ew-resize",
-            background: "#e1e5ea",
-            zIndex: 10,
-            userSelect: "none"
+            width: 14,
+            height: 30,
+            border: "none",
+            background: "transparent",
+            cursor: "pointer",
+            fontWeight: 700,
+            fontSize: 17,
+            outline: "none",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "absolute",
+            right: 1, // align to the edge
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: "#444",
+            padding: 0,
+            zIndex: 20
           }}
-        />
-      )}
+          tabIndex={0}
+        >
+          {sidebarCollapsed ? "»" : "«"}
+        </button>
+      </div>
 
       {/* Main content */}
       <div style={{
