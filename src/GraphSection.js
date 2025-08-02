@@ -6,7 +6,6 @@ import {
 // Helper: flatten data for a single day; show just "HH:mm" on x-axis
 function makeHourData(dayData) {
   if (!dayData) return [];
-  // Collect sorted times strictly from this day's arrays
   const times = Array.from(
     new Set([
       ...(dayData.solarEnergy || []).map(d => d.time),
@@ -22,7 +21,6 @@ function makeHourData(dayData) {
   const demand = Object.fromEntries((dayData.demandEnergy || []).map(d => [d.time, d.value]));
 
   return times.map(time => ({
-    // Only show hours and minutes (works for both "T" and space separators)
     time: time.includes("T") ? time.split("T")[1].slice(0,5) :
           time.includes(" ") ? time.split(" ")[1].slice(0,5) :
           time.slice(-8, -3),
@@ -33,7 +31,7 @@ function makeHourData(dayData) {
   }));
 }
 
-function EnergyLineChart({ data, dataKey, color, title, unit }) {
+function EnergyLineChart({ data, dataKey, color, title }) {
   return (
     <div style={{
       background: "#fff",
@@ -46,9 +44,9 @@ function EnergyLineChart({ data, dataKey, color, title, unit }) {
       <ResponsiveContainer width="100%" height={220}>
         <LineChart data={data}>
           <XAxis dataKey="time" tick={{fontSize:10}} interval={2} />
-          <YAxis unit={unit || ""} tick={{fontSize:12}} domain={['auto', 'auto']} />
+          <YAxis tick={{fontSize:12}} domain={['auto', 'auto']} />
           <CartesianGrid strokeDasharray="3 3" />
-          <Tooltip formatter={v => `${v}${unit || ""}`} />
+          <Tooltip />
           <Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} dot={false} isAnimationActive />
         </LineChart>
       </ResponsiveContainer>
@@ -113,7 +111,6 @@ function GraphSection({ locationId }) {
             dataKey="windEnergy"
             title="Wind Energy"
             color="#03a9f4"
-            unit=" MW"
           />
           <EnergyLineChart
             data={data}
