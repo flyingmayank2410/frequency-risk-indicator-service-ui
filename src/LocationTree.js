@@ -33,32 +33,31 @@ function LocationTree({ onSelectLocation, onSelectSwitchgear, refresh }) {
         return (
           <li key={location.id} style={{ marginBottom: 8 }}>
             <div style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
-              <div
+              <span
                 onClick={() => toggleLocation(location.id)}
                 style={{
-                  width: 16,
-                  height: 16,
+                  width: 18,
+                  height: 18,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   userSelect: "none",
                   marginRight: 8,
-                  border: "1px solid #fff",
-                  borderRadius: 2,
                   fontWeight: "bold",
-                  fontSize: 12,
+                  fontSize: 16,
                   color: "#fff",
+                  transition: "transform .15s"
                 }}
                 aria-label={isExpanded ? "Collapse" : "Expand"}
               >
-                {isExpanded ? "−" : "+"}
-              </div>
+                {isExpanded ? "▼" : "▶"}
+              </span>
               <span
                 onClick={() => onSelectLocation(location)}
                 style={{
                   fontWeight: isExpanded ? "bold" : "normal",
                   color: "#fff",
-                  fontSize: 18 // Font bigger for location name
+                  fontSize: 18
                 }}
               >
                 {location.locationName}
@@ -110,8 +109,8 @@ function SwitchgearBranch({ locationId, onSelectSwitchgear }) {
             padding: "2px 4px",
             borderRadius: 4,
             marginBottom: 2,
-            color: "#fff", // now solid white for child, too
-            fontSize: 16, // slightly smaller than parent
+            color: "#fff",
+            fontSize: 16,
             fontWeight: 500
           }}
         >
