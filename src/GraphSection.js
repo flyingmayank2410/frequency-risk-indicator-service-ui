@@ -3,9 +3,10 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from "recharts";
 
-// Helper: flatten arrays into per-hour objects for one day, formatting time to HH:mm
+// Helper: flatten data for a single day; show just "HH:mm" on x-axis
 function makeHourData(dayData) {
   if (!dayData) return [];
+  // Collect sorted times strictly from this day's arrays
   const times = Array.from(
     new Set([
       ...(dayData.solarEnergy || []).map(d => d.time),
@@ -14,13 +15,17 @@ function makeHourData(dayData) {
       ...(dayData.demandEnergy || []).map(d => d.time)
     ])
   ).sort();
+
   const solar = Object.fromEntries((dayData.solarEnergy || []).map(d => [d.time, d.value]));
   const wind = Object.fromEntries((dayData.windEnergy || []).map(d => [d.time, d.value]));
   const total = Object.fromEntries((dayData.totalEnergy || []).map(d => [d.time, d.value]));
   const demand = Object.fromEntries((dayData.demandEnergy || []).map(d => [d.time, d.value]));
 
   return times.map(time => ({
-    time: time.includes("T") ? time.split("T")[1].slice(0,5) : time.slice(-8, -3),
+    // Only show hours and minutes (works for both "T" and space separators)
+    time: time.includes("T") ? time.split("T")[1].slice(0,5) :
+          time.includes(" ") ? time.split(" ")[1].slice(0,5) :
+          time.slice(-8, -3),
     solarEnergy: +solar[time] || 0,
     windEnergy: +wind[time] || 0,
     totalEnergy: +total[time] || 0,
@@ -32,16 +37,16 @@ function EnergyLineChart({ data, dataKey, color, title, unit }) {
   return (
     <div style={{
       background: "#fff",
-      borderRadius: 8,
+      borderRadius: 10,
       margin: "16px 0",
       padding: 20,
-      boxShadow: "0 2px 8px rgba(50,50,50,0.05)"
+      boxShadow: "0 2px 8px rgba(50,50,50,0.06)"
     }}>
       <h4 style={{margin:0, marginBottom:8, color}}>{title}</h4>
       <ResponsiveContainer width="100%" height={220}>
         <LineChart data={data}>
           <XAxis dataKey="time" tick={{fontSize:10}} interval={2} />
-          <YAxis unit={unit || ""} domain={['auto', 'auto']} tick={{fontSize:12}} />
+          <YAxis unit={unit || ""} tick={{fontSize:12}} domain={['auto', 'auto']} />
           <CartesianGrid strokeDasharray="3 3" />
           <Tooltip formatter={v => `${v}${unit || ""}`} />
           <Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} dot={false} isAnimationActive />
@@ -100,25 +105,26 @@ function GraphSection({ locationId }) {
           <EnergyLineChart
             data={data}
             dataKey="solarEnergy"
-            title="Solar Energy MW"
+            title="Solar Energy"
             color="#ff9800"
           />
           <EnergyLineChart
             data={data}
             dataKey="windEnergy"
-            title="Wind Energy MW"
+            title="Wind Energy"
             color="#03a9f4"
+            unit=" MW"
           />
           <EnergyLineChart
             data={data}
             dataKey="totalEnergy"
-            title="Total Energy MW"
+            title="Total Energy"
             color="#4caf50"
           />
           <EnergyLineChart
             data={data}
             dataKey="demandEnergy"
-            title="Demand Energy MW"
+            title="Demand Energy"
             color="#e91e63"
           />
         </>
