@@ -17,7 +17,6 @@ function LocationTree({ onSelectLocation, onSelectSwitchgear, refresh }) {
       .catch(() => setLocations([]));
   }, [refresh]);
 
-  // Toggle expanded state for a location by id
   function toggleLocation(id) {
     setExpandedLocations(prev => {
       const newSet = new Set(prev);
@@ -44,10 +43,11 @@ function LocationTree({ onSelectLocation, onSelectSwitchgear, refresh }) {
                   justifyContent: "center",
                   userSelect: "none",
                   marginRight: 8,
-                  border: "1px solid #999",
+                  border: "1px solid #fff",
                   borderRadius: 2,
                   fontWeight: "bold",
                   fontSize: 12,
+                  color: "#fff"
                 }}
                 aria-label={isExpanded ? "Collapse" : "Expand"}
               >
@@ -55,7 +55,7 @@ function LocationTree({ onSelectLocation, onSelectSwitchgear, refresh }) {
               </div>
               <span
                 onClick={() => onSelectLocation(location)}
-                style={{ fontWeight: isExpanded ? "bold" : "normal", color: "#1976d2" }}
+                style={{ fontWeight: isExpanded ? "bold" : "normal", color: "#7cb7ff" }}
               >
                 {location.locationName}
               </span>
@@ -103,7 +103,7 @@ function SwitchgearBranch({ locationId, onSelectSwitchgear }) {
             padding: "2px 4px",
             borderRadius: 4,
             marginBottom: 2,
-            color: "#555",
+            color: "#bbb",
           }}
         >
           {swg.swgName}

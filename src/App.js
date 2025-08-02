@@ -9,6 +9,7 @@ function App() {
   const [selectedSwitchgear, setSelectedSwitchgear] = useState(null);
   const [showLocationForm, setShowLocationForm] = useState(false);
   const [refresh, setRefresh] = useState(false);
+
   const [panelWidth, setPanelWidth] = useState(320);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const dragging = useRef(false);
@@ -62,16 +63,17 @@ function App() {
   }, []);
 
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
+    <div style={{ display: "flex", height: "100vh", background: "#000" }}>
       {/* Sidebar */}
       <div style={{
         width: sidebarCollapsed ? 0 : panelWidth,
         minWidth: sidebarCollapsed ? 0 : 200,
         maxWidth: sidebarCollapsed ? 0 : 600,
-        borderRight: sidebarCollapsed ? 'none' : "1px solid #ddd",
+        borderRight: sidebarCollapsed ? 'none' : "1px solid #222",
         padding: sidebarCollapsed ? 0 : 16,
         boxSizing: "border-box",
-        background: "#fafbfc",
+        background: "#1a1a1a",
+        color: "#fff",
         transition: "width 0.2s, min-width 0.2s, max-width 0.2s",
         overflow: "hidden",
         display: sidebarCollapsed ? "none" : "flex",
@@ -88,7 +90,14 @@ function App() {
             refresh={refresh}
           />
         </div>
-        <button style={{ marginTop: 10 }} onClick={() => {
+        <button style={{
+          marginTop: 10,
+          background: "#444",
+          color: "#fff",
+          border: "none",
+          borderRadius: 6,
+          padding: "10px 18px"
+        }} onClick={() => {
           setSelectedLocation({});
           setShowLocationForm(true);
           setSelectedSwitchgear(null);
@@ -97,56 +106,54 @@ function App() {
         </button>
       </div>
 
-      {/* Draggable Resizer with Collapse/Expand */}
       {/* Draggable Resizer with Collapse/Expand at the TOP */}
-<div
-  onMouseDown={startDrag}
-  onTouchStart={startDrag}
-  style={{
-    width: 16,
-    cursor: sidebarCollapsed ? "pointer" : "ew-resize",
-    background: "#e1e5ea",
-    zIndex: 10,
-    userSelect: "none",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    borderRight: "1px solid #ccc",
-    position: "relative"
-  }}
->
-  <button
-    aria-label={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-    onClick={() => setSidebarCollapsed(c => !c)}
-    style={{
-      width: 14,
-      height: 30,
-      border: "none",
-      background: "transparent",
-      cursor: "pointer",
-      fontWeight: 700,
-      fontSize: 17,
-      outline: "none",
-      marginTop: 2,
-      marginBottom: 4,
-      color: "#444",
-      padding: 0,
-      zIndex: 20
-    }}
-    tabIndex={0}
-  >
-    {sidebarCollapsed ? "»" : "«"}
-  </button>
-  {/* The rest of the bar below is empty for dragging */}
-</div>
-
+      <div
+        onMouseDown={startDrag}
+        onTouchStart={startDrag}
+        style={{
+          width: 16,
+          cursor: sidebarCollapsed ? "pointer" : "ew-resize",
+          background: "#222",
+          zIndex: 10,
+          userSelect: "none",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          borderRight: "1px solid #111",
+          position: "relative"
+        }}
+      >
+        <button
+          aria-label={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          onClick={() => setSidebarCollapsed(c => !c)}
+          style={{
+            width: 14,
+            height: 30,
+            border: "none",
+            background: "transparent",
+            cursor: "pointer",
+            fontWeight: 700,
+            fontSize: 17,
+            outline: "none",
+            marginTop: 2,
+            marginBottom: 4,
+            color: "#fff",
+            padding: 0,
+            zIndex: 20
+          }}
+          tabIndex={0}
+        >
+          {sidebarCollapsed ? "»" : "«"}
+        </button>
+      </div>
 
       {/* Main content */}
       <div style={{
         flex: 1,
         padding: 16,
         overflowY: "auto",
-        background: "#f5f6f8",
+        background: "#000",
+        color: "#fff",
         minWidth: 0
       }}>
         {selectedLocation && !showLocationForm && !selectedSwitchgear && (
@@ -159,19 +166,32 @@ function App() {
               flexWrap: "wrap",
               gap: "8px"
             }}>
-              <h3 style={{ margin:0 }}>
+              <h3 style={{ margin:0, color:"#fff" }}>
                 Energy Graphs for {selectedLocation.locationName || "Current Location"}
               </h3>
               <div>
                 <button
                   onClick={handleEditLocation}
-                  style={{ marginRight: 12, padding: "8px 14px" }}
+                  style={{
+                    marginRight: 12,
+                    padding: "8px 14px",
+                    background: "#333",
+                    color: "#fff",
+                    borderRadius: 6,
+                    border: "none"
+                  }}
                 >
                   Edit Location
                 </button>
                 <button
                   onClick={handleAddSwitchgear}
-                  style={{ padding: "8px 14px" }}
+                  style={{
+                    padding: "8px 14px",
+                    background: "#333",
+                    color: "#fff",
+                    borderRadius: 6,
+                    border: "none"
+                  }}
                 >
                   + Add Switchgear
                 </button>

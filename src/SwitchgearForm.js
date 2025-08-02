@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 
 function SwitchgearForm({ switchgear, onRefresh, onBack }) {
-  const isEdit = !!switchgear.swgId;
+  const isEdit = !!switchgear?.swgId;
   const [form, setForm] = useState({
     swgName: "",
     incomerFeeder: 0,
     outgoingFeeder: 0,
     activeIncomerFeeder: 0,
     activeOutgoingFeeder: 0,
-    locationId: switchgear.locationId || "",
+    locationId: switchgear?.locationId || "",
   });
 
   useEffect(() => {
@@ -28,10 +28,7 @@ function SwitchgearForm({ switchgear, onRefresh, onBack }) {
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setForm(f => ({
-      ...f,
-      [name]: value
-    }));
+    setForm(f => ({ ...f, [name]: value }));
   }
 
   function handleSubmit(e) {
@@ -55,82 +52,135 @@ function SwitchgearForm({ switchgear, onRefresh, onBack }) {
     <form
       onSubmit={handleSubmit}
       style={{
-        background: "#fff",
+        background: "#111",
         borderRadius: 10,
-        boxShadow: "0 2px 8px rgba(50,50,50,0.06)",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.26)",
         padding: 24,
         maxWidth: 380,
-        width: "100%"
+        width: "100%",
+        color: "#fff",
       }}
     >
-      <h3>{isEdit ? "Edit" : "Add"} Switchgear</h3>
+      <h3 style={{ color: "#fff" }}>{isEdit ? "Edit" : "Add"} Switchgear</h3>
 
       <div style={{ marginBottom: 10 }}>
-        <label htmlFor="swgName">Switchgear Name</label>
+        <label htmlFor="swgName" style={{ color: "#fff" }}>
+          Switchgear Name
+        </label>
         <input
           id="swgName"
           name="swgName"
           value={form.swgName}
           onChange={handleChange}
           placeholder="Name"
-          style={{ width: "100%" }}
+          style={{
+            width: "100%",
+            background: "#222",
+            color: "#fff",
+            border: "1px solid #444",
+            borderRadius: 6,
+            padding: "8px",
+          }}
+          required
         />
       </div>
 
       <div style={{ marginBottom: 10 }}>
-        <label htmlFor="incomerFeeder">Incomer Feeder</label>
+        <label htmlFor="incomerFeeder" style={{ color: "#fff" }}>
+          Incomer Feeder
+        </label>
         <input
           id="incomerFeeder"
           name="incomerFeeder"
           type="number"
+          min="0"
           value={form.incomerFeeder}
           onChange={handleChange}
           placeholder="Incomer Feeder"
-          style={{ width: "100%" }}
+          style={{
+            width: "100%",
+            background: "#222",
+            color: "#fff",
+            border: "1px solid #444",
+            borderRadius: 6,
+            padding: "8px",
+          }}
         />
       </div>
 
       <div style={{ marginBottom: 10 }}>
-        <label htmlFor="outgoingFeeder">Outgoing Feeder</label>
+        <label htmlFor="outgoingFeeder" style={{ color: "#fff" }}>
+          Outgoing Feeder
+        </label>
         <input
           id="outgoingFeeder"
           name="outgoingFeeder"
           type="number"
+          min="0"
           value={form.outgoingFeeder}
           onChange={handleChange}
           placeholder="Outgoing Feeder"
-          style={{ width: "100%" }}
+          style={{
+            width: "100%",
+            background: "#222",
+            color: "#fff",
+            border: "1px solid #444",
+            borderRadius: 6,
+            padding: "8px",
+          }}
         />
       </div>
 
       <div style={{ marginBottom: 10 }}>
-        <label htmlFor="activeIncomerFeeder">Active Incomer Feeder</label>
+        <label htmlFor="activeIncomerFeeder" style={{ color: "#fff" }}>
+          Active Incomer Feeder
+        </label>
         <input
           id="activeIncomerFeeder"
           name="activeIncomerFeeder"
           type="number"
+          min="0"
           value={form.activeIncomerFeeder}
           onChange={handleChange}
           placeholder="Active Incomer Feeder"
-          style={{ width: "100%" }}
+          style={{
+            width: "100%",
+            background: "#222",
+            color: "#fff",
+            border: "1px solid #444",
+            borderRadius: 6,
+            padding: "8px",
+          }}
         />
       </div>
 
       <div style={{ marginBottom: 10 }}>
-        <label htmlFor="activeOutgoingFeeder">Active Outgoing Feeder</label>
+        <label htmlFor="activeOutgoingFeeder" style={{ color: "#fff" }}>
+          Active Outgoing Feeder
+        </label>
         <input
           id="activeOutgoingFeeder"
           name="activeOutgoingFeeder"
           type="number"
+          min="0"
           value={form.activeOutgoingFeeder}
           onChange={handleChange}
           placeholder="Active Outgoing Feeder"
-          style={{ width: "100%" }}
+          style={{
+            width: "100%",
+            background: "#222",
+            color: "#fff",
+            border: "1px solid #444",
+            borderRadius: 6,
+            padding: "8px",
+          }}
         />
       </div>
 
       <div style={{ marginBottom: 18 }}>
-        <label htmlFor="locationId">Location ID</label>
+        <label htmlFor="locationId" style={{ color: "#fff" }}>
+          Location ID
+        </label>
         <input
           id="locationId"
           name="locationId"
@@ -141,15 +191,42 @@ function SwitchgearForm({ switchgear, onRefresh, onBack }) {
           readOnly={!!switchgear.locationId}
           style={{
             width: "100%",
-            backgroundColor: switchgear.locationId ? "#f0f0f0" : "white"
+            backgroundColor: switchgear.locationId ? "#333" : "#222",
+            color: "#fff",
+            border: "1px solid #444",
+            borderRadius: 6,
+            padding: "8px",
           }}
+          required
         />
       </div>
 
-      <button type="submit" style={{ marginRight: 8 }}>
+      <button
+        type="submit"
+        style={{
+          marginRight: 8,
+          background: "#333",
+          color: "#fff",
+          border: "none",
+          borderRadius: 6,
+          padding: "10px 18px",
+          cursor: "pointer",
+        }}
+      >
         {isEdit ? "Update" : "Create"}
       </button>
-      <button type="button" onClick={onBack}>
+      <button
+        type="button"
+        onClick={onBack}
+        style={{
+          background: "#333",
+          color: "#fff",
+          border: "none",
+          borderRadius: 6,
+          padding: "10px 18px",
+          cursor: "pointer",
+        }}
+      >
         Back
       </button>
     </form>

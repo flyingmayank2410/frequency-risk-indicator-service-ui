@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 function LocationForm({ location, onRefresh, onAddSwitchgear }) {
-  const isEdit = !!location.id;
+  const isEdit = !!location?.id;
   const [form, setForm] = useState({
     locationName: "",
     latitude: "",
@@ -27,10 +27,8 @@ function LocationForm({ location, onRefresh, onAddSwitchgear }) {
   }, [location]);
 
   function handleChange(e) {
-    setForm(f => ({
-      ...f,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+    setForm(f => ({ ...f, [name]: value }));
   }
 
   function handleSubmit(e) {
@@ -50,44 +48,182 @@ function LocationForm({ location, onRefresh, onAddSwitchgear }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{
-      background: "#fff",
-      borderRadius: 10,
-      boxShadow: "0 2px 8px rgba(50,50,50,0.06)",
-      padding: 24,
-      maxWidth: 380,
-      width: "100%"
-    }}>
-      <h3>{isEdit ? "Edit" : "Add"} Location</h3>
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        background: "#111",
+        borderRadius: 10,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.26)",
+        padding: 24,
+        maxWidth: 380,
+        width: "100%",
+        color: "#fff",
+      }}
+    >
+      <h3 style={{ color: "#fff" }}>{isEdit ? "Edit" : "Add"} Location</h3>
+
       <div style={{ marginBottom: 10 }}>
-        <label htmlFor="locationName">Location Name</label>
-        <input id="locationName" name="locationName" value={form.locationName} onChange={handleChange} placeholder="Name" style={{width:"100%"}} />
+        <label htmlFor="locationName" style={{ color: "#fff" }}>
+          Location Name
+        </label>
+        <input
+          id="locationName"
+          name="locationName"
+          value={form.locationName}
+          onChange={handleChange}
+          placeholder="Name"
+          style={{
+            width: "100%",
+            background: "#222",
+            color: "#fff",
+            border: "1px solid #444",
+            borderRadius: 6,
+            padding: "8px",
+          }}
+          required
+        />
       </div>
+
       <div style={{ marginBottom: 10 }}>
-        <label htmlFor="latitude">Latitude</label>
-        <input id="latitude" name="latitude" value={form.latitude} onChange={handleChange} placeholder="Latitude" style={{width:"100%"}} />
+        <label htmlFor="latitude" style={{ color: "#fff" }}>
+          Latitude
+        </label>
+        <input
+          id="latitude"
+          name="latitude"
+          value={form.latitude}
+          onChange={handleChange}
+          placeholder="Latitude"
+          style={{
+            width: "100%",
+            background: "#222",
+            color: "#fff",
+            border: "1px solid #444",
+            borderRadius: 6,
+            padding: "8px",
+          }}
+          required
+        />
       </div>
+
       <div style={{ marginBottom: 10 }}>
-        <label htmlFor="longitude">Longitude</label>
-        <input id="longitude" name="longitude" value={form.longitude} onChange={handleChange} placeholder="Longitude" style={{width:"100%"}} />
+        <label htmlFor="longitude" style={{ color: "#fff" }}>
+          Longitude
+        </label>
+        <input
+          id="longitude"
+          name="longitude"
+          value={form.longitude}
+          onChange={handleChange}
+          placeholder="Longitude"
+          style={{
+            width: "100%",
+            background: "#222",
+            color: "#fff",
+            border: "1px solid #444",
+            borderRadius: 6,
+            padding: "8px",
+          }}
+          required
+        />
       </div>
+
       <div style={{ marginBottom: 10 }}>
-        <label htmlFor="address">Address</label>
-        <input id="address" name="address" value={form.address} onChange={handleChange} placeholder="Address" style={{width:"100%"}} />
+        <label htmlFor="address" style={{ color: "#fff" }}>
+          Address
+        </label>
+        <input
+          id="address"
+          name="address"
+          value={form.address}
+          onChange={handleChange}
+          placeholder="Address"
+          style={{
+            width: "100%",
+            background: "#222",
+            color: "#fff",
+            border: "1px solid #444",
+            borderRadius: 6,
+            padding: "8px",
+          }}
+        />
       </div>
+
       <div style={{ marginBottom: 10 }}>
-        <label htmlFor="windMillCount">Wind Mill Count</label>
-        <input id="windMillCount" name="windMillCount" type="number" value={form.windMillCount} onChange={handleChange} placeholder="Wind Mill Count" style={{width:"100%"}} />
+        <label htmlFor="windMillCount" style={{ color: "#fff" }}>
+          Wind Mill Count
+        </label>
+        <input
+          id="windMillCount"
+          name="windMillCount"
+          type="number"
+          value={form.windMillCount}
+          onChange={handleChange}
+          placeholder="Wind Mill Count"
+          min={0}
+          style={{
+            width: "100%",
+            background: "#222",
+            color: "#fff",
+            border: "1px solid #444",
+            borderRadius: 6,
+            padding: "8px",
+          }}
+        />
       </div>
+
       <div style={{ marginBottom: 18 }}>
-        <label htmlFor="solarPanelCount">Solar Panel Count</label>
-        <input id="solarPanelCount" name="solarPanelCount" type="number" value={form.solarPanelCount} onChange={handleChange} placeholder="Solar Panel Count" style={{width:"100%"}} />
+        <label htmlFor="solarPanelCount" style={{ color: "#fff" }}>
+          Solar Panel Count
+        </label>
+        <input
+          id="solarPanelCount"
+          name="solarPanelCount"
+          type="number"
+          value={form.solarPanelCount}
+          onChange={handleChange}
+          placeholder="Solar Panel Count"
+          min={0}
+          style={{
+            width: "100%",
+            background: "#222",
+            color: "#fff",
+            border: "1px solid #444",
+            borderRadius: 6,
+            padding: "8px",
+          }}
+        />
       </div>
-      <button type="submit" style={{marginRight:8}}>
+
+      <button
+        type="submit"
+        style={{
+          marginRight: 8,
+          background: "#333",
+          color: "#fff",
+          border: "none",
+          borderRadius: 6,
+          padding: "10px 18px",
+          cursor: "pointer",
+        }}
+      >
         {isEdit ? "Update" : "Create"}
       </button>
       {isEdit && (
-        <button type="button" onClick={onAddSwitchgear}>+ Add Switchgear</button>
+        <button
+          type="button"
+          onClick={onAddSwitchgear}
+          style={{
+            background: "#333",
+            color: "#fff",
+            border: "none",
+            borderRadius: 6,
+            padding: "10px 18px",
+            cursor: "pointer",
+          }}
+        >
+          + Add Switchgear
+        </button>
       )}
     </form>
   );
