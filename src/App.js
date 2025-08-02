@@ -7,10 +7,23 @@ import GraphSection from "./GraphSection";
 function App() {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [selectedSwitchgear, setSelectedSwitchgear] = useState(null);
+  const [showLocationForm, setShowLocationForm] = useState(false);
   const [refresh, setRefresh] = useState(false);
 
   function handleTreeRefresh() {
     setRefresh(r => !r);
+    setShowLocationForm(false);
+    setSelectedSwitchgear(null);
+  }
+
+  function handleEditLocation() {
+    setShowLocationForm(true);
+    setSelectedSwitchgear(null);
+  }
+
+  function handleAddSwitchgear() {
+    setShowLocationForm(false);
+    setSelectedSwitchgear({ locationId: selectedLocation.id });
   }
 
   return (
@@ -19,32 +32,63 @@ function App() {
         <LocationTree
           onSelectLocation={loc => {
             setSelectedLocation(loc);
+            setShowLocationForm(false);
             setSelectedSwitchgear(null);
           }}
           onSelectSwitchgear={swg => setSelectedSwitchgear(swg)}
           refresh={refresh}
         />
-        <button onClick={() => setSelectedLocation({})}>
+        <button onClick={() => {
+          setSelectedLocation({});
+          setShowLocationForm(true);
+          setSelectedSwitchgear(null);
+        }}>
           + Add Location
         </button>
       </div>
       <div style={{ width: "70%", padding: 16 }}>
-        {selectedLocation && !selectedSwitchgear && (
+        {selectedLocation && !showLocationForm && !selectedSwitchgear && (
+          <>
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 12
+            }}>
+              <h3 style={{margin:0}}>Energy Graphs for Current Location</h3>
+              <div>
+                <button
+                  onClick={handleEditLocation}
+                  style={{ marginRight: 12, padding: "8px 14px" }}
+                >
+                  Edit Location
+                </button>
+                <button
+                  onClick={handleAddSwitchgear}
+                  style={{ padding: "8px 14px" }}
+                >
+                  + Add Switchgear
+                </button>
+              </div>
+            </div>
+            <GraphSection locationId={selectedLocation.id} />
+          </>
+        )}
+
+        {showLocationForm && (
           <LocationForm
             location={selectedLocation}
             onRefresh={handleTreeRefresh}
-            onAddSwitchgear={() => setSelectedSwitchgear({ locationId: selectedLocation.id })}
+            onAddSwitchgear={handleAddSwitchgear}
           />
         )}
+
         {selectedSwitchgear && (
           <SwitchgearForm
             switchgear={selectedSwitchgear}
             onRefresh={handleTreeRefresh}
             onBack={() => setSelectedSwitchgear(null)}
           />
-        )}
-        {selectedLocation && selectedLocation.id && !selectedSwitchgear && (
-          <GraphSection locationId={selectedLocation.id} />
         )}
       </div>
     </div>
