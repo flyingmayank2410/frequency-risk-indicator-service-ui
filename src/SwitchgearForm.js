@@ -205,7 +205,7 @@ function SwitchgearForm({ switchgear, onRefresh, onBack }) {
         type="submit"
         style={{
           marginRight: 8,
-          background: "#333",
+          background: "#50aaff",
           color: "#fff",
           border: "none",
           borderRadius: 6,
@@ -219,7 +219,7 @@ function SwitchgearForm({ switchgear, onRefresh, onBack }) {
         type="button"
         onClick={onBack}
         style={{
-          background: "#333",
+          background: "#50aaff",
           color: "#fff",
           border: "none",
           borderRadius: 6,

@@ -199,7 +199,7 @@ function LocationForm({ location, onRefresh, onAddSwitchgear }) {
         type="submit"
         style={{
           marginRight: 8,
-          background: "#333",
+          background: "#50aaff",
           color: "#fff",
           border: "none",
           borderRadius: 6,
@@ -214,7 +214,7 @@ function LocationForm({ location, onRefresh, onAddSwitchgear }) {
           type="button"
           onClick={onAddSwitchgear}
           style={{
-            background: "#333",
+            background: "#50aaff",
             color: "#fff",
             border: "none",
             borderRadius: 6,

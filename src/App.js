@@ -92,7 +92,7 @@ function App() {
         </div>
         <button style={{
           marginTop: 10,
-          background: "#444",
+          background: "#50aaff",
           color: "#fff",
           border: "none",
           borderRadius: 6,
@@ -175,7 +175,7 @@ function App() {
                   style={{
                     marginRight: 12,
                     padding: "8px 14px",
-                    background: "#333",
+                    background: "#50aaff",
                     color: "#fff",
                     borderRadius: 6,
                     border: "none"
@@ -187,7 +187,7 @@ function App() {
                   onClick={handleAddSwitchgear}
                   style={{
                     padding: "8px 14px",
-                    background: "#333",
+                    background: "#50aaff",
                     color: "#fff",
                     borderRadius: 6,
                     border: "none"
