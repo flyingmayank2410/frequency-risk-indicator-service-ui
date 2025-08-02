@@ -100,30 +100,26 @@ function GraphSection({ locationId }) {
           <EnergyLineChart
             data={data}
             dataKey="solarEnergy"
-            title="Solar Energy"
+            title="Solar Energy MW"
             color="#ff9800"
-            unit=" MW"
           />
           <EnergyLineChart
             data={data}
             dataKey="windEnergy"
-            title="Wind Energy"
+            title="Wind Energy MW"
             color="#03a9f4"
-            unit=" MW"
           />
           <EnergyLineChart
             data={data}
             dataKey="totalEnergy"
-            title="Total Energy"
+            title="Total Energy MW"
             color="#4caf50"
-            unit=" MW"
           />
           <EnergyLineChart
             data={data}
             dataKey="demandEnergy"
-            title="Demand Energy"
+            title="Demand Energy MW"
             color="#e91e63"
-            unit=" MW"
           />
         </>
       )}
