@@ -64,7 +64,7 @@ function LocationTree({ onSelectLocation, onSelectSwitchgear, refresh }) {
                   marginRight: 6,
                   fontWeight: 400,
                   fontSize: 14,
-                  color: "#b5bac8",
+                  color: "#50aaff",
                   cursor: "pointer",
                   transition: "color 0.13s"
                 }}
