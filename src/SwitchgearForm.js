@@ -27,9 +27,10 @@ function SwitchgearForm({ switchgear, onRefresh, onBack }) {
   }, [switchgear, isEdit]);
 
   function handleChange(e) {
+    const { name, value } = e.target;
     setForm(f => ({
       ...f,
-      [e.target.name]: e.target.value,
+      [name]: value
     }));
   }
 
@@ -51,25 +52,64 @@ function SwitchgearForm({ switchgear, onRefresh, onBack }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} style={{
+      background: "#fff",
+      borderRadius: 10,
+      boxShadow: "0 2px 8px rgba(50,50,50,0.06)",
+      padding: 24,
+      maxWidth: 380,
+      width: "100%"
+    }}>
       <h3>{isEdit ? "Edit" : "Add"} Switchgear</h3>
-      <input name="swgName" value={form.swgName} onChange={handleChange} placeholder="Name" />
-      <input name="incomerFeeder" type="number" value={form.incomerFeeder} onChange={handleChange} placeholder="Incomer Feeder" />
-      <input name="outgoingFeeder" type="number" value={form.outgoingFeeder} onChange={handleChange} placeholder="Outgoing Feeder" />
-      <input name="activeIncomerFeeder" type="number" value={form.activeIncomerFeeder} onChange={handleChange} placeholder="Active Incomer Feeder" />
-      <input name="activeOutgoingFeeder" type="number" value={form.activeOutgoingFeeder} onChange={handleChange} placeholder="Active Outgoing Feeder" />
-      <input
-        name="locationId"
-        type="number"
-        value={form.locationId}
-        onChange={handleChange}
-        placeholder="Location Id"
-        readOnly={!!switchgear.locationId}
-      />
-      <button type="submit">{isEdit ? "Update" : "Create"}</button>
-      <button type="button" onClick={onBack}>Back</button>
-    </form>
-  );
-}
-
-export default SwitchgearForm;
+      <div style={{ marginBottom: 10 }}>
+        <label htmlFor="swgName">Switchgear Name</label>
+        <input
+          id="swgName"
+          name="swgName"
+          value={form.swgName}
+          onChange={handleChange}
+          placeholder="Name"
+          style={{ width: "100%" }}
+        />
+      </div>
+      <div style={{ marginBottom: 10 }}>
+        <label htmlFor="incomerFeeder">Incomer Feeder</label>
+        <input
+          id="incomerFeeder"
+          name="incomerFeeder"
+          type="number"
+          value={form.incomerFeeder}
+          onChange={handleChange}
+          placeholder="Incomer Feeder"
+          style={{ width: "100%" }}
+        />
+      </div>
+      <div style={{ marginBottom: 10 }}>
+        <label htmlFor="outgoingFeeder">Outgoing Feeder</label>
+        <input
+          id="outgoingFeeder"
+          name="outgoingFeeder"
+          type="number"
+          value={form.outgoingFeeder}
+          onChange={handleChange}
+          placeholder="Outgoing Feeder"
+          style={{ width: "100%" }}
+        />
+      </div>
+      <div style={{ marginBottom: 10 }}>
+        <label htmlFor="activeIncomerFeeder">Active Incomer Feeder</label>
+        <input
+          id="activeIncomerFeeder"
+          name="activeIncomerFeeder"
+          type="number"
+          value={form.activeIncomerFeeder}
+          onChange={handleChange}
+          placeholder="Active Incomer Feeder"
+          style={{ width: "100%" }}
+        />
+      </div>
+      <div style={{ marginBottom: 10 }}>
+        <label htmlFor="activeOutgoingFeeder">Active Outgoing Feeder</label>
+        <input
+          id="activeOutgoingFeeder"
+          name
