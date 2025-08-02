@@ -13,7 +13,6 @@ function LocationForm({ location, onRefresh, onAddSwitchgear }) {
 
   useEffect(() => {
     if (location && location.id) {
-      // Fetch full location details just in case
       fetch(`https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/location/config/${location.id}`)
         .then(res => res.json())
         .then(response => {
@@ -51,15 +50,42 @@ function LocationForm({ location, onRefresh, onAddSwitchgear }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} style={{
+      background: "#fff",
+      borderRadius: 10,
+      boxShadow: "0 2px 8px rgba(50,50,50,0.06)",
+      padding: 24,
+      maxWidth: 380,
+      width: "100%"
+    }}>
       <h3>{isEdit ? "Edit" : "Add"} Location</h3>
-      <input name="locationName" value={form.locationName} onChange={handleChange} placeholder="Name" />
-      <input name="latitude" value={form.latitude} onChange={handleChange} placeholder="Latitude" />
-      <input name="longitude" value={form.longitude} onChange={handleChange} placeholder="Longitude" />
-      <input name="address" value={form.address} onChange={handleChange} placeholder="Address" />
-      <input name="windMillCount" type="number" value={form.windMillCount} onChange={handleChange} placeholder="Wind Mill Count" />
-      <input name="solarPanelCount" type="number" value={form.solarPanelCount} onChange={handleChange} placeholder="Solar Panel Count" />
-      <button type="submit">{isEdit ? "Update" : "Create"}</button>
+      <div style={{ marginBottom: 10 }}>
+        <label htmlFor="locationName">Location Name</label>
+        <input id="locationName" name="locationName" value={form.locationName} onChange={handleChange} placeholder="Name" style={{width:"100%"}} />
+      </div>
+      <div style={{ marginBottom: 10 }}>
+        <label htmlFor="latitude">Latitude</label>
+        <input id="latitude" name="latitude" value={form.latitude} onChange={handleChange} placeholder="Latitude" style={{width:"100%"}} />
+      </div>
+      <div style={{ marginBottom: 10 }}>
+        <label htmlFor="longitude">Longitude</label>
+        <input id="longitude" name="longitude" value={form.longitude} onChange={handleChange} placeholder="Longitude" style={{width:"100%"}} />
+      </div>
+      <div style={{ marginBottom: 10 }}>
+        <label htmlFor="address">Address</label>
+        <input id="address" name="address" value={form.address} onChange={handleChange} placeholder="Address" style={{width:"100%"}} />
+      </div>
+      <div style={{ marginBottom: 10 }}>
+        <label htmlFor="windMillCount">Wind Mill Count</label>
+        <input id="windMillCount" name="windMillCount" type="number" value={form.windMillCount} onChange={handleChange} placeholder="Wind Mill Count" style={{width:"100%"}} />
+      </div>
+      <div style={{ marginBottom: 18 }}>
+        <label htmlFor="solarPanelCount">Solar Panel Count</label>
+        <input id="solarPanelCount" name="solarPanelCount" type="number" value={form.solarPanelCount} onChange={handleChange} placeholder="Solar Panel Count" style={{width:"100%"}} />
+      </div>
+      <button type="submit" style={{marginRight:8}}>
+        {isEdit ? "Update" : "Create"}
+      </button>
       {isEdit && (
         <button type="button" onClick={onAddSwitchgear}>+ Add Switchgear</button>
       )}
