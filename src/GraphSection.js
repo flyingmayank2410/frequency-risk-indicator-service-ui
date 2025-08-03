@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend
 } from "recharts";
+import { DateTime } from "luxon"; // <--- NEW import
 
-// Helper to normalize all API "time" to HH:mm (removes doubles)
-function hourMinuteFromTime(t) {
-  if (!t) return "";
-  let res = "";
-  if (t.includes("T")) res = t.split("T")[1].slice(0,5);
-  else if (t.match(/^\d{4}-\d{2}-\d{2}/)) res = t.split(" ")[1]?.slice(0,5) || "";
-  else res = t.slice(0,5);
-  return res;
+// Converts UTC times to IST and outputs "HH:mm"
+function hourMinuteISTfromUTC(raw) {
+  if (!raw) return "";
+  let iso = raw.replace(" ", "T");
+  // Parse as UTC and convert to IST (Asia/Kolkata = UTC+5:30)
+  const dt = DateTime.fromISO(iso, { zone: "utc" }).setZone("Asia/Kolkata");
+  return dt.toFormat("HH:mm");
 }
 
 function makeHourData(dayData) {
@@ -21,9 +21,9 @@ function makeHourData(dayData) {
     ...(dayData.totalEnergy || []).map(d => d.time),
     ...(dayData.demandEnergy || []).map(d => d.time),
   ];
-  const times = Array.from(new Set(allTimes.map(hourMinuteFromTime))).sort();
+  const times = Array.from(new Set(allTimes.map(hourMinuteISTfromUTC))).sort();
 
-  const makeMap = arr => Object.fromEntries((arr || []).map(d => [hourMinuteFromTime(d.time), d.value]));
+  const makeMap = arr => Object.fromEntries((arr || []).map(d => [hourMinuteISTfromUTC(d.time), d.value]));
   const solar = makeMap(dayData.solarEnergy);
   const wind = makeMap(dayData.windEnergy);
   const total = makeMap(dayData.totalEnergy);
@@ -89,7 +89,7 @@ function GraphSection({ locationId }) {
 
   return (
     <div>
-      <h3 style={{color:"#fff"}}>Energy Graphs for {selectedDate || "Selected Date"}</h3>
+      <h3 style={{color:"#fff"}}>Energy Graphs for {selectedDate || "Selected Date"} (IST)</h3>
       <div style={{marginBottom:12}}>
         <label style={{color:"#fff"}}>
           Select date:&nbsp;
