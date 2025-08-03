@@ -30,18 +30,17 @@ function App() {
     setSelectedSwitchgear({ locationId: selectedLocation?.id });
   }
 
-  // Hide the form on cancel, return to graph
+  // Cancel button from LocationForm hides form and goes back to graph
   function handleCancelForm() {
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
-    // selectedLocation is preserved for the graph
   }
 
-  // After update/add, return to graph for that location and refresh
+  // This refresh handler is called after Update or Create in LocationForm
   function handleLocationFormRefresh() {
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
-    setRefresh(r => !r); // triggers LocationTree and GraphSection to reload
+    setRefresh(r => !r); // triggers LocationTree and GraphSection data reload
   }
 
   // Drag and resize logic for sidebar
