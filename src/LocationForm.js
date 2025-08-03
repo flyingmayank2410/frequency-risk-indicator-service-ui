@@ -41,7 +41,7 @@ function LocationForm({ location, onRefresh, onAddSwitchgear, onCancel }) {
       .then(res => res.json())
       .then(response => {
         if (response && response.data && typeof response.data === "object") {
-          onRefresh && onRefresh();
+          onRefresh && onRefresh(); // returns to Location graph page
         }
       })
       .catch(() => {});
@@ -61,7 +61,6 @@ function LocationForm({ location, onRefresh, onAddSwitchgear, onCancel }) {
       }}
     >
       <h3 style={{ color: "#fff" }}>{isEdit ? "Edit" : "Add"} Location</h3>
-
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="locationName" style={{ color: "#fff" }}>
           Location Name

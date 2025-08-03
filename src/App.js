@@ -14,43 +14,39 @@ function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const dragging = useRef(false);
 
-  // Refresh tree and reset forms/selection
   function handleTreeRefresh() {
     setRefresh(r => !r);
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
   }
 
-  // When editing existing location: show form
   function handleEditLocation() {
     setShowLocationForm(true);
     setSelectedSwitchgear(null);
   }
 
-  // When adding a new switchgear, show switchgear form
   function handleAddSwitchgear() {
     setShowLocationForm(false);
     setSelectedSwitchgear({ locationId: selectedLocation?.id });
   }
 
-  // Handle Cancel in LocationForm: hide form, show graph
+  // Hide the form on cancel, return to graph
   function handleCancelForm() {
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
-    // keep selectedLocation for graph display
+    // selectedLocation is preserved for the graph
   }
 
-  // Called after a successful edit/add location
-  // Refresh tree and show graph for current location
+  // After update/add, return to graph for that location and refresh
   function handleLocationFormRefresh() {
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
-    setRefresh(r => !r); // triggers LocationTree and GraphSection refresh
+    setRefresh(r => !r); // triggers LocationTree and GraphSection to reload
   }
 
-  // Drag and resize logic
+  // Drag and resize logic for sidebar
   function startDrag(e) {
-    if (sidebarCollapsed) return; // no resize if collapsed
+    if (sidebarCollapsed) return;
     dragging.current = true;
     document.body.style.cursor = "ew-resize";
     e.preventDefault();
