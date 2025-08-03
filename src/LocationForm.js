@@ -46,8 +46,7 @@ function LocationForm({ location, onRefresh, onAddSwitchgear, onCancel }) {
       .then(res => res.json())
       .then(response => {
         if (response && response.data && typeof response.data === "object") {
-          // Important: call onRefresh to close form & refresh graph
-          onRefresh && onRefresh();
+          onRefresh && onRefresh(); // closes form and refreshes graph
         }
       })
       .catch(() => {});
@@ -67,7 +66,6 @@ function LocationForm({ location, onRefresh, onAddSwitchgear, onCancel }) {
       }}
     >
       <h3 style={{ color: "#fff" }}>{isEdit ? "Edit" : "Add"} Location</h3>
-
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="locationName" style={{ color: "#fff" }}>
           Location Name
@@ -89,7 +87,6 @@ function LocationForm({ location, onRefresh, onAddSwitchgear, onCancel }) {
           required
         />
       </div>
-
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="latitude" style={{ color: "#fff" }}>
           Latitude
@@ -111,7 +108,6 @@ function LocationForm({ location, onRefresh, onAddSwitchgear, onCancel }) {
           required
         />
       </div>
-
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="longitude" style={{ color: "#fff" }}>
           Longitude
@@ -133,7 +129,6 @@ function LocationForm({ location, onRefresh, onAddSwitchgear, onCancel }) {
           required
         />
       </div>
-
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="address" style={{ color: "#fff" }}>
           Address
@@ -154,7 +149,6 @@ function LocationForm({ location, onRefresh, onAddSwitchgear, onCancel }) {
           }}
         />
       </div>
-
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="windMillCount" style={{ color: "#fff" }}>
           Wind Mill Count
@@ -177,7 +171,6 @@ function LocationForm({ location, onRefresh, onAddSwitchgear, onCancel }) {
           }}
         />
       </div>
-
       <div style={{ marginBottom: 18 }}>
         <label htmlFor="solarPanelCount" style={{ color: "#fff" }}>
           Solar Panel Count
@@ -200,7 +193,6 @@ function LocationForm({ location, onRefresh, onAddSwitchgear, onCancel }) {
           }}
         />
       </div>
-
       <button
         type="submit"
         style={{
@@ -211,12 +203,11 @@ function LocationForm({ location, onRefresh, onAddSwitchgear, onCancel }) {
           borderRadius: 6,
           padding: "10px 18px",
           fontWeight: "bold",
-          cursor: "pointer",
+          cursor: "pointer"
         }}
       >
         {isEdit ? "Update" : "Create"}
       </button>
-
       {isEdit && (
         <button
           type="button"
@@ -228,13 +219,12 @@ function LocationForm({ location, onRefresh, onAddSwitchgear, onCancel }) {
             borderRadius: 6,
             padding: "10px 18px",
             fontWeight: "bold",
-            cursor: "pointer",
+            cursor: "pointer"
           }}
         >
           + Add Switchgear
         </button>
       )}
-
       <button
         type="button"
         onClick={onCancel}

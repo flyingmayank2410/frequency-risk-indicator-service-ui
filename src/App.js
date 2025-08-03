@@ -30,20 +30,20 @@ function App() {
     setSelectedSwitchgear({ locationId: selectedLocation?.id });
   }
 
-  // Cancel button from LocationForm hides form and goes back to graph
+  // Cancel button handler: hide form, show graph
   function handleCancelForm() {
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
   }
 
-  // This refresh handler is called after Update or Create in LocationForm
+  // Called after update/add in LocationForm
   function handleLocationFormRefresh() {
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
-    setRefresh(r => !r); // triggers LocationTree and GraphSection data reload
+    setRefresh(r => !r);
   }
 
-  // Drag and resize logic for sidebar
+  // Sidebar resize drag handlers
   function startDrag(e) {
     if (sidebarCollapsed) return;
     dragging.current = true;
@@ -96,12 +96,12 @@ function App() {
       >
         <div style={{ flex: 1, overflowY: "auto" }}>
           <LocationTree
-            onSelectLocation={(loc) => {
+            onSelectLocation={loc => {
               setSelectedLocation(loc);
               setShowLocationForm(false);
               setSelectedSwitchgear(null);
             }}
-            onSelectSwitchgear={(swg) => setSelectedSwitchgear(swg)}
+            onSelectSwitchgear={swg => setSelectedSwitchgear(swg)}
             refresh={refresh}
           />
         </div>
@@ -126,7 +126,7 @@ function App() {
         </button>
       </div>
 
-      {/* Draggable Resizer with collapse/expand */}
+      {/* Draggable Resizer */}
       <div
         onMouseDown={startDrag}
         onTouchStart={startDrag}
@@ -145,7 +145,7 @@ function App() {
       >
         <button
           aria-label={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          onClick={() => setSidebarCollapsed((c) => !c)}
+          onClick={() => setSidebarCollapsed(c => !c)}
           style={{
             width: 14,
             height: 30,
@@ -178,7 +178,6 @@ function App() {
           minWidth: 0
         }}
       >
-        {/* Show graphs if location selected and not editing or adding switchgear */}
         {selectedLocation && !showLocationForm && !selectedSwitchgear && (
           <>
             <div
@@ -192,8 +191,7 @@ function App() {
               }}
             >
               <h3 style={{ margin: 0, color: "#fff" }}>
-                Energy Graphs for{" "}
-                {selectedLocation.locationName || "Current Location"}
+                Energy Graphs for {selectedLocation.locationName || "Current Location"}
               </h3>
               <div>
                 <button
@@ -206,7 +204,7 @@ function App() {
                     borderRadius: 6,
                     border: "none",
                     fontWeight: "bold",
-                    cursor: "pointer",
+                    cursor: "pointer"
                   }}
                 >
                   Edit Location
@@ -220,7 +218,7 @@ function App() {
                     borderRadius: 6,
                     border: "none",
                     fontWeight: "bold",
-                    cursor: "pointer",
+                    cursor: "pointer"
                   }}
                 >
                   + Add Switchgear
@@ -230,8 +228,6 @@ function App() {
             <GraphSection locationId={selectedLocation.id} />
           </>
         )}
-
-        {/* Location edit/add form */}
         {showLocationForm && (
           <LocationForm
             location={selectedLocation}
@@ -240,8 +236,6 @@ function App() {
             onCancel={handleCancelForm}
           />
         )}
-
-        {/* Switchgear add/edit form */}
         {selectedSwitchgear && (
           <SwitchgearForm
             switchgear={selectedSwitchgear}
