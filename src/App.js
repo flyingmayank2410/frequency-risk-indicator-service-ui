@@ -14,23 +14,43 @@ function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const dragging = useRef(false);
 
+  // Refresh tree and reset forms/selection
   function handleTreeRefresh() {
     setRefresh(r => !r);
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
   }
+
+  // When editing existing location: show form
   function handleEditLocation() {
     setShowLocationForm(true);
     setSelectedSwitchgear(null);
   }
+
+  // When adding a new switchgear, show switchgear form
   function handleAddSwitchgear() {
     setShowLocationForm(false);
     setSelectedSwitchgear({ locationId: selectedLocation?.id });
   }
 
-  // Drag logic for resizing sidebar
+  // Handle Cancel in LocationForm: hide form, show graph
+  function handleCancelForm() {
+    setShowLocationForm(false);
+    setSelectedSwitchgear(null);
+    // keep selectedLocation for graph display
+  }
+
+  // Called after a successful edit/add location
+  // Refresh tree and show graph for current location
+  function handleLocationFormRefresh() {
+    setShowLocationForm(false);
+    setSelectedSwitchgear(null);
+    setRefresh(r => !r); // triggers LocationTree and GraphSection refresh
+  }
+
+  // Drag and resize logic
   function startDrag(e) {
-    if (sidebarCollapsed) return; // don't resize when collapsed
+    if (sidebarCollapsed) return; // no resize if collapsed
     dragging.current = true;
     document.body.style.cursor = "ew-resize";
     e.preventDefault();
@@ -49,64 +69,69 @@ function App() {
   useEffect(() => {
     function handleDrag(e) { onDrag(e); }
     function handleUp() { stopDrag(); }
-    window.addEventListener('mousemove', handleDrag);
-    window.addEventListener('mouseup', handleUp);
-    window.addEventListener('touchmove', handleDrag);
-    window.addEventListener('touchend', handleUp);
+    window.addEventListener("mousemove", handleDrag);
+    window.addEventListener("mouseup", handleUp);
+    window.addEventListener("touchmove", handleDrag);
+    window.addEventListener("touchend", handleUp);
     return () => {
-      window.removeEventListener('mousemove', handleDrag);
-      window.removeEventListener('mouseup', handleUp);
-      window.removeEventListener('touchmove', handleDrag);
-      window.removeEventListener('touchend', handleUp);
+      window.removeEventListener("mousemove", handleDrag);
+      window.removeEventListener("mouseup", handleUp);
+      window.removeEventListener("touchmove", handleDrag);
+      window.removeEventListener("touchend", handleUp);
     };
-    // eslint-disable-next-line
   }, []);
 
   return (
     <div style={{ display: "flex", height: "100vh", background: "#000" }}>
       {/* Sidebar */}
-      <div style={{
-        width: sidebarCollapsed ? 0 : panelWidth,
-        minWidth: sidebarCollapsed ? 0 : 200,
-        maxWidth: sidebarCollapsed ? 0 : 600,
-        borderRight: sidebarCollapsed ? 'none' : "1px solid #222",
-        padding: sidebarCollapsed ? 0 : 16,
-        boxSizing: "border-box",
-        background: "#1a1a1a",
-        color: "#fff",
-        transition: "width 0.2s, min-width 0.2s, max-width 0.2s",
-        overflow: "hidden",
-        display: sidebarCollapsed ? "none" : "flex",
-        flexDirection: "column"
-      }}>
+      <div
+        style={{
+          width: sidebarCollapsed ? 0 : panelWidth,
+          minWidth: sidebarCollapsed ? 0 : 200,
+          maxWidth: sidebarCollapsed ? 0 : 600,
+          borderRight: sidebarCollapsed ? "none" : "1px solid #222",
+          padding: sidebarCollapsed ? 0 : 16,
+          boxSizing: "border-box",
+          background: "#1a1a1a",
+          color: "#fff",
+          overflow: "hidden",
+          display: sidebarCollapsed ? "none" : "flex",
+          flexDirection: "column"
+        }}
+      >
         <div style={{ flex: 1, overflowY: "auto" }}>
           <LocationTree
-            onSelectLocation={loc => {
+            onSelectLocation={(loc) => {
               setSelectedLocation(loc);
               setShowLocationForm(false);
               setSelectedSwitchgear(null);
             }}
-            onSelectSwitchgear={swg => setSelectedSwitchgear(swg)}
+            onSelectSwitchgear={(swg) => setSelectedSwitchgear(swg)}
             refresh={refresh}
           />
         </div>
-        <button style={{
-          marginTop: 10,
-          background: "#50aaff",
-          color: "#fff",
-          border: "none",
-          borderRadius: 6,
-          padding: "10px 18px"
-        }} onClick={() => {
-          setSelectedLocation({});
-          setShowLocationForm(true);
-          setSelectedSwitchgear(null);
-        }}>
+        <button
+          style={{
+            marginTop: 10,
+            background: "#50aaff",
+            color: "#fff",
+            border: "none",
+            borderRadius: 6,
+            padding: "10px 18px",
+            fontWeight: "bold",
+            cursor: "pointer"
+          }}
+          onClick={() => {
+            setSelectedLocation({});
+            setShowLocationForm(true);
+            setSelectedSwitchgear(null);
+          }}
+        >
           + Add Location
         </button>
       </div>
 
-      {/* Draggable Resizer with Collapse/Expand at the TOP */}
+      {/* Draggable Resizer with collapse/expand */}
       <div
         onMouseDown={startDrag}
         onTouchStart={startDrag}
@@ -125,7 +150,7 @@ function App() {
       >
         <button
           aria-label={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          onClick={() => setSidebarCollapsed(c => !c)}
+          onClick={() => setSidebarCollapsed((c) => !c)}
           style={{
             width: 14,
             height: 30,
@@ -148,26 +173,32 @@ function App() {
       </div>
 
       {/* Main content */}
-      <div style={{
-        flex: 1,
-        padding: 16,
-        overflowY: "auto",
-        background: "#000",
-        color: "#fff",
-        minWidth: 0
-      }}>
+      <div
+        style={{
+          flex: 1,
+          padding: 16,
+          overflowY: "auto",
+          background: "#000",
+          color: "#fff",
+          minWidth: 0
+        }}
+      >
+        {/* Show graphs if location selected and not editing or adding switchgear */}
         {selectedLocation && !showLocationForm && !selectedSwitchgear && (
           <>
-            <div style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 12,
-              flexWrap: "wrap",
-              gap: "8px"
-            }}>
-              <h3 style={{ margin:0, color:"#fff" }}>
-                Energy Graphs for {selectedLocation.locationName || "Current Location"}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 12,
+                flexWrap: "wrap",
+                gap: "8px"
+              }}
+            >
+              <h3 style={{ margin: 0, color: "#fff" }}>
+                Energy Graphs for{" "}
+                {selectedLocation.locationName || "Current Location"}
               </h3>
               <div>
                 <button
@@ -178,7 +209,9 @@ function App() {
                     background: "#50aaff",
                     color: "#fff",
                     borderRadius: 6,
-                    border: "none"
+                    border: "none",
+                    fontWeight: "bold",
+                    cursor: "pointer",
                   }}
                 >
                   Edit Location
@@ -190,7 +223,9 @@ function App() {
                     background: "#50aaff",
                     color: "#fff",
                     borderRadius: 6,
-                    border: "none"
+                    border: "none",
+                    fontWeight: "bold",
+                    cursor: "pointer",
                   }}
                 >
                   + Add Switchgear
@@ -200,13 +235,18 @@ function App() {
             <GraphSection locationId={selectedLocation.id} />
           </>
         )}
+
+        {/* Location edit/add form */}
         {showLocationForm && (
           <LocationForm
             location={selectedLocation}
-            onRefresh={handleTreeRefresh}
+            onRefresh={handleLocationFormRefresh}
             onAddSwitchgear={handleAddSwitchgear}
+            onCancel={handleCancelForm}
           />
         )}
+
+        {/* Switchgear add/edit form */}
         {selectedSwitchgear && (
           <SwitchgearForm
             switchgear={selectedSwitchgear}

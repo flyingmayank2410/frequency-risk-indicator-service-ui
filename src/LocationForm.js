@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-function LocationForm({ location, onRefresh, onAddSwitchgear }) {
+function LocationForm({ location, onRefresh, onAddSwitchgear, onCancel }) {
   const isEdit = !!location?.id;
   const [form, setForm] = useState({
     locationName: "",
@@ -83,7 +83,6 @@ function LocationForm({ location, onRefresh, onAddSwitchgear }) {
           required
         />
       </div>
-
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="latitude" style={{ color: "#fff" }}>
           Latitude
@@ -105,7 +104,6 @@ function LocationForm({ location, onRefresh, onAddSwitchgear }) {
           required
         />
       </div>
-
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="longitude" style={{ color: "#fff" }}>
           Longitude
@@ -127,7 +125,6 @@ function LocationForm({ location, onRefresh, onAddSwitchgear }) {
           required
         />
       </div>
-
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="address" style={{ color: "#fff" }}>
           Address
@@ -148,7 +145,6 @@ function LocationForm({ location, onRefresh, onAddSwitchgear }) {
           }}
         />
       </div>
-
       <div style={{ marginBottom: 10 }}>
         <label htmlFor="windMillCount" style={{ color: "#fff" }}>
           Wind Mill Count
@@ -171,7 +167,6 @@ function LocationForm({ location, onRefresh, onAddSwitchgear }) {
           }}
         />
       </div>
-
       <div style={{ marginBottom: 18 }}>
         <label htmlFor="solarPanelCount" style={{ color: "#fff" }}>
           Solar Panel Count
@@ -194,7 +189,6 @@ function LocationForm({ location, onRefresh, onAddSwitchgear }) {
           }}
         />
       </div>
-
       <button
         type="submit"
         style={{
@@ -204,7 +198,8 @@ function LocationForm({ location, onRefresh, onAddSwitchgear }) {
           border: "none",
           borderRadius: 6,
           padding: "10px 18px",
-          cursor: "pointer",
+          fontWeight: "bold",
+          cursor: "pointer"
         }}
       >
         {isEdit ? "Update" : "Create"}
@@ -219,12 +214,29 @@ function LocationForm({ location, onRefresh, onAddSwitchgear }) {
             border: "none",
             borderRadius: 6,
             padding: "10px 18px",
+            fontWeight: "bold",
             cursor: "pointer",
           }}
         >
           + Add Switchgear
         </button>
       )}
+      <button
+        type="button"
+        onClick={onCancel}
+        style={{
+          background: "#50aaff",
+          color: "#fff",
+          border: "none",
+          borderRadius: 6,
+          padding: "10px 18px",
+          fontWeight: "bold",
+          cursor: "pointer",
+          marginLeft: 8,
+        }}
+      >
+        Cancel
+      </button>
     </form>
   );
 }
