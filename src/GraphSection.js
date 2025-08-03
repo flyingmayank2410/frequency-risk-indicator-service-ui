@@ -9,7 +9,7 @@ function hourMinuteFromTime(t) {
   let res = "";
   if (t.includes("T")) res = t.split("T")[1].slice(0,5);
   else if (t.match(/^\d{4}-\d{2}-\d{2}/)) res = t.split(" ")[1]?.slice(0,5) || "";
-  else res = t.slice(0,5); // fallback: already just "03:00" etc.
+  else res = t.slice(0,5);
   return res;
 }
 
@@ -43,12 +43,12 @@ function EnergyLineChart({ data, dataKey, color, title }) {
     <div style={{
       background: "#111",
       borderRadius: 10,
-      margin: "16px 0",
+      margin: "8px 0",
       padding: 20,
       boxShadow: "0 2px 8px rgba(0,0,0,0.26)"
     }}>
       <h4 style={{margin:0, marginBottom:8, color:"#fff"}}>{title}</h4>
-      <ResponsiveContainer width="100%" height={220}>
+      <ResponsiveContainer width="100%" height={200}>
         <LineChart data={data}>
           <XAxis dataKey="time" tick={{fontSize:10, fill:"#fff"}} interval={2} />
           <YAxis tick={{fontSize:12, fill:"#fff"}} domain={['auto', 'auto']} />
@@ -96,7 +96,14 @@ function GraphSection({ locationId }) {
           <select
             value={selectedDate}
             onChange={e => setSelectedDate(e.target.value)}
-            style={{fontSize:"1em", background: "#333", color: "#fff", border: "1px solid #555", borderRadius: 4, padding: "2px 4px"}}
+            style={{
+              fontSize:"1em",
+              background: "#333",
+              color: "#fff",
+              border: "1px solid #555",
+              borderRadius: 4,
+              padding: "2px 4px"
+            }}
           >
             {dateKeys.map(date =>
               <option key={date} value={date}>{date}</option>
@@ -107,32 +114,44 @@ function GraphSection({ locationId }) {
       {data.length === 0 ? (
         <div style={{color:"#fff"}}>No data for this date.</div>
       ) : (
-        <>
-          <EnergyLineChart
-            data={data}
-            dataKey="solarEnergy"
-            title="Solar Energy"
-            color="#ff9800"
-          />
-          <EnergyLineChart
-            data={data}
-            dataKey="windEnergy"
-            title="Wind Energy"
-            color="#03a9f4"
-          />
-          <EnergyLineChart
-            data={data}
-            dataKey="totalEnergy"
-            title="Total Energy"
-            color="#4caf50"
-          />
-          <EnergyLineChart
-            data={data}
-            dataKey="demandEnergy"
-            title="Demand Energy"
-            color="#e91e63"
-          />
-        </>
+        <div style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "16px"
+        }}>
+          <div style={{flex: "1 1 calc(50% - 16px)", minWidth: 0}}>
+            <EnergyLineChart
+              data={data}
+              dataKey="solarEnergy"
+              title="Solar Energy"
+              color="#ff9800"
+            />
+          </div>
+          <div style={{flex: "1 1 calc(50% - 16px)", minWidth: 0}}>
+            <EnergyLineChart
+              data={data}
+              dataKey="windEnergy"
+              title="Wind Energy"
+              color="#03a9f4"
+            />
+          </div>
+          <div style={{flex: "1 1 calc(50% - 16px)", minWidth: 0}}>
+            <EnergyLineChart
+              data={data}
+              dataKey="totalEnergy"
+              title="Total Energy"
+              color="#4caf50"
+            />
+          </div>
+          <div style={{flex: "1 1 calc(50% - 16px)", minWidth: 0}}>
+            <EnergyLineChart
+              data={data}
+              dataKey="demandEnergy"
+              title="Demand Energy"
+              color="#e91e63"
+            />
+          </div>
+        </div>
       )}
     </div>
   );
