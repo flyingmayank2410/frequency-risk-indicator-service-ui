@@ -16,39 +16,37 @@ function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const dragging = useRef(false);
 
-  // Refresh sidebar tree and reset forms/selection
   function handleTreeRefresh() {
     setRefresh(r => !r);
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
   }
 
-  // Show the location edit form
   function handleEditLocation() {
     setShowLocationForm(true);
     setSelectedSwitchgear(null);
   }
 
-  // Show add switchgear form
   function handleAddSwitchgear() {
     setShowLocationForm(false);
     setSelectedSwitchgear({ locationId: selectedLocation?.id });
   }
 
-  // Cancel the location form and return to graph view
   function handleCancelForm() {
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
   }
 
-  // After location create/update, close form and refresh graph/tree
-  function handleLocationFormRefresh() {
+  // Accepts new/updated location data and updates selection after create
+  function handleLocationFormRefresh(newLocationData) {
+    if (newLocationData && newLocationData.id) {
+      setSelectedLocation(newLocationData);
+    }
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
     setRefresh(r => !r);
   }
 
-  // Sidebar drag start
   function startDrag(e) {
     if (sidebarCollapsed) return;
     dragging.current = true;
@@ -56,7 +54,6 @@ function App() {
     e.preventDefault();
   }
 
-  // Sidebar dragging - adjust width dynamically
   function onDrag(e) {
     if (dragging.current) {
       const x = e.touches ? e.touches[0].clientX : e.clientX;
@@ -65,13 +62,11 @@ function App() {
     }
   }
 
-  // Sidebar drag stop
   function stopDrag() {
     dragging.current = false;
     document.body.style.cursor = "";
   }
 
-  // Setup event listeners for drag
   useEffect(() => {
     function handleDrag(e) { onDrag(e); }
     function handleUp() { stopDrag(); }
@@ -89,7 +84,6 @@ function App() {
 
   return (
     <div style={{ display: "flex", height: "100vh", background: "#000" }}>
-      
       {/* Sidebar */}
       <div
         style={{
@@ -179,7 +173,7 @@ function App() {
         </button>
       </div>
 
-      {/* Main content panel */}
+      {/* Main content / right panel */}
       <div
         style={{
           flex: 1,
@@ -190,8 +184,7 @@ function App() {
           minWidth: 0
         }}
       >
-        {/* When NO location, no forms, no switchgears selected:
-            show Switchgear & Feeder Type info side by side and below them the message */}
+        {/* Show cards and message only if nothing is selected */}
         {!selectedLocation && !showLocationForm && !selectedSwitchgear && (
           <>
             <div style={{ display: "flex", gap: 20, marginBottom: 12 }}>
@@ -204,7 +197,7 @@ function App() {
           </>
         )}
 
-        {/* Show graph page when a location is selected */}
+        {/* Show Graph section if location selected */}
         {selectedLocation && !showLocationForm && !selectedSwitchgear && (
           <>
             <div
@@ -252,6 +245,7 @@ function App() {
                 </button>
               </div>
             </div>
+            {/* Pass correct locationId (never undefined): */}
             <GraphSection locationId={selectedLocation.id} />
           </>
         )}
@@ -260,7 +254,7 @@ function App() {
         {showLocationForm && (
           <LocationForm
             location={selectedLocation}
-            onRefresh={handleLocationFormRefresh}
+            onRefresh={handleLocationFormRefresh} // passes back location data after create
             onAddSwitchgear={handleAddSwitchgear}
             onCancel={handleCancelForm}
           />

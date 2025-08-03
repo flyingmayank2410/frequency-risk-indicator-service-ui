@@ -46,7 +46,8 @@ function LocationForm({ location, onRefresh, onAddSwitchgear, onCancel }) {
       .then(res => res.json())
       .then(response => {
         if (response && response.data && typeof response.data === "object") {
-          onRefresh && onRefresh(); // closes form and refreshes graph
+          // Pass new/updated location data back to parent
+          onRefresh && onRefresh(response.data);
         }
       })
       .catch(() => {});
