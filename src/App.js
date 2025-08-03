@@ -16,7 +16,7 @@ function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const dragging = useRef(false);
 
-  // Refresh sidebar tree and reset forms/selections
+  // Refresh sidebar tree and reset forms/selection
   function handleTreeRefresh() {
     setRefresh(r => !r);
     setShowLocationForm(false);
@@ -29,23 +29,23 @@ function App() {
     setSelectedSwitchgear(null);
   }
 
-  // Show switchgear add form
+  // Show add switchgear form
   function handleAddSwitchgear() {
     setShowLocationForm(false);
     setSelectedSwitchgear({ locationId: selectedLocation?.id });
   }
 
-  // Cancel the location form, go back to graph
+  // Cancel the location form and return to graph view
   function handleCancelForm() {
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
   }
 
-  // After successful edit/add of location, refresh graph and close form
+  // After location create/update, close form and refresh graph/tree
   function handleLocationFormRefresh() {
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
-    setRefresh(r => !r); // triggers graph and tree refresh
+    setRefresh(r => !r);
   }
 
   // Sidebar drag start
@@ -56,7 +56,7 @@ function App() {
     e.preventDefault();
   }
 
-  // Sidebar dragging - resize width dynamically
+  // Sidebar dragging - adjust width dynamically
   function onDrag(e) {
     if (dragging.current) {
       const x = e.touches ? e.touches[0].clientX : e.clientX;
@@ -89,6 +89,7 @@ function App() {
 
   return (
     <div style={{ display: "flex", height: "100vh", background: "#000" }}>
+      
       {/* Sidebar */}
       <div
         style={{
@@ -107,12 +108,12 @@ function App() {
       >
         <div style={{ flex: 1, overflowY: "auto" }}>
           <LocationTree
-            onSelectLocation={(loc) => {
+            onSelectLocation={loc => {
               setSelectedLocation(loc);
               setShowLocationForm(false);
               setSelectedSwitchgear(null);
             }}
-            onSelectSwitchgear={(swg) => setSelectedSwitchgear(swg)}
+            onSelectSwitchgear={swg => setSelectedSwitchgear(swg)}
             refresh={refresh}
           />
         </div>
@@ -136,8 +137,8 @@ function App() {
           + Add Location
         </button>
       </div>
-      
-      {/* Draggable Resizer with collapse/expand */}
+
+      {/* Resizer and collapse button */}
       <div
         onMouseDown={startDrag}
         onTouchStart={startDrag}
@@ -189,11 +190,21 @@ function App() {
           minWidth: 0
         }}
       >
-        {/* Constant info cards */}
-        <SwgTypeInfo />
-        <FeederTypeInfo />
+        {/* When NO location, no forms, no switchgears selected:
+            show Switchgear & Feeder Type info side by side and below them the message */}
+        {!selectedLocation && !showLocationForm && !selectedSwitchgear && (
+          <>
+            <div style={{ display: "flex", gap: 20, marginBottom: 12 }}>
+              <SwgTypeInfo />
+              <FeederTypeInfo />
+            </div>
+            <div style={{ color: "#888", fontSize: 16, textAlign: "center", marginTop: 8 }}>
+              No Location Selected
+            </div>
+          </>
+        )}
 
-        {/* Show graphs when location selected and not editing or adding switchgear */}
+        {/* Show graph page when a location is selected */}
         {selectedLocation && !showLocationForm && !selectedSwitchgear && (
           <>
             <div
@@ -245,7 +256,7 @@ function App() {
           </>
         )}
 
-        {/* Location add/edit form */}
+        {/* Location form */}
         {showLocationForm && (
           <LocationForm
             location={selectedLocation}
@@ -255,7 +266,7 @@ function App() {
           />
         )}
 
-        {/* Switchgear add/edit form */}
+        {/* Switchgear form */}
         {selectedSwitchgear && (
           <SwitchgearForm
             switchgear={selectedSwitchgear}

@@ -37,7 +37,6 @@ function SwgTypeInfo() {
       boxShadow: "0 2px 8px rgba(0,0,0,0.26)"
     }}>
       <h3 style={{ marginTop: 0, marginBottom: 8, color: "#50aaff" }}>Switchgear Type Info</h3>
-      <p><strong>ID:</strong> {swgTypeData.id}</p>
       <p><strong>Type:</strong> {swgTypeData.swgType}</p>
       <p><strong>Name:</strong> {swgTypeData.swgName}</p>
     </div>

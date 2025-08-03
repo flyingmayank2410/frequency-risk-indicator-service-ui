@@ -37,10 +37,8 @@ function FeederTypeInfo() {
       boxShadow: "0 2px 8px rgba(0,0,0,0.26)"
     }}>
       <h3 style={{ marginTop: 0, marginBottom: 8, color: "#50aaff" }}>Feeder Type Info</h3>
-      <p><strong>ID:</strong> {feederTypeData.id}</p>
       <p><strong>Name:</strong> {feederTypeData.feederName}</p>
       <p><strong>Type:</strong> {feederTypeData.feederType}</p>
-      <p><strong>Switchgear Type ID:</strong> {feederTypeData.swgTypeId}</p>
     </div>
   );
 }
