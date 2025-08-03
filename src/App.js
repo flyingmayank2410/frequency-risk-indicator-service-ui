@@ -3,6 +3,8 @@ import LocationTree from "./LocationTree";
 import LocationForm from "./LocationForm";
 import SwitchgearForm from "./SwitchgearForm";
 import GraphSection from "./GraphSection";
+import SwgTypeInfo from "./SwgTypeInfo";
+import FeederTypeInfo from "./FeederTypeInfo";
 
 function App() {
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -14,42 +16,47 @@ function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const dragging = useRef(false);
 
+  // Refresh sidebar tree and reset forms/selections
   function handleTreeRefresh() {
     setRefresh(r => !r);
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
   }
 
+  // Show the location edit form
   function handleEditLocation() {
     setShowLocationForm(true);
     setSelectedSwitchgear(null);
   }
 
+  // Show switchgear add form
   function handleAddSwitchgear() {
     setShowLocationForm(false);
     setSelectedSwitchgear({ locationId: selectedLocation?.id });
   }
 
-  // Cancel button handler: hide form, show graph
+  // Cancel the location form, go back to graph
   function handleCancelForm() {
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
   }
 
-  // Called after update/add in LocationForm
+  // After successful edit/add of location, refresh graph and close form
   function handleLocationFormRefresh() {
     setShowLocationForm(false);
     setSelectedSwitchgear(null);
-    setRefresh(r => !r);
+    setRefresh(r => !r); // triggers graph and tree refresh
   }
 
-  // Sidebar resize drag handlers
+  // Sidebar drag start
   function startDrag(e) {
     if (sidebarCollapsed) return;
     dragging.current = true;
     document.body.style.cursor = "ew-resize";
     e.preventDefault();
   }
+
+  // Sidebar dragging - resize width dynamically
   function onDrag(e) {
     if (dragging.current) {
       const x = e.touches ? e.touches[0].clientX : e.clientX;
@@ -57,10 +64,14 @@ function App() {
       setPanelWidth(newWidth);
     }
   }
+
+  // Sidebar drag stop
   function stopDrag() {
     dragging.current = false;
     document.body.style.cursor = "";
   }
+
+  // Setup event listeners for drag
   useEffect(() => {
     function handleDrag(e) { onDrag(e); }
     function handleUp() { stopDrag(); }
@@ -96,12 +107,12 @@ function App() {
       >
         <div style={{ flex: 1, overflowY: "auto" }}>
           <LocationTree
-            onSelectLocation={loc => {
+            onSelectLocation={(loc) => {
               setSelectedLocation(loc);
               setShowLocationForm(false);
               setSelectedSwitchgear(null);
             }}
-            onSelectSwitchgear={swg => setSelectedSwitchgear(swg)}
+            onSelectSwitchgear={(swg) => setSelectedSwitchgear(swg)}
             refresh={refresh}
           />
         </div>
@@ -125,8 +136,8 @@ function App() {
           + Add Location
         </button>
       </div>
-
-      {/* Draggable Resizer */}
+      
+      {/* Draggable Resizer with collapse/expand */}
       <div
         onMouseDown={startDrag}
         onTouchStart={startDrag}
@@ -167,7 +178,7 @@ function App() {
         </button>
       </div>
 
-      {/* Main content */}
+      {/* Main content panel */}
       <div
         style={{
           flex: 1,
@@ -178,6 +189,11 @@ function App() {
           minWidth: 0
         }}
       >
+        {/* Constant info cards */}
+        <SwgTypeInfo />
+        <FeederTypeInfo />
+
+        {/* Show graphs when location selected and not editing or adding switchgear */}
         {selectedLocation && !showLocationForm && !selectedSwitchgear && (
           <>
             <div
@@ -228,6 +244,8 @@ function App() {
             <GraphSection locationId={selectedLocation.id} />
           </>
         )}
+
+        {/* Location add/edit form */}
         {showLocationForm && (
           <LocationForm
             location={selectedLocation}
@@ -236,6 +254,8 @@ function App() {
             onCancel={handleCancelForm}
           />
         )}
+
+        {/* Switchgear add/edit form */}
         {selectedSwitchgear && (
           <SwitchgearForm
             switchgear={selectedSwitchgear}
