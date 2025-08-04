@@ -41,7 +41,7 @@ function PredictionChart({ totalEnergy }) {
     setError(null);
 
     // Call the correct prediction API for frequency data
-    fetch('https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/frequency-prediction', {
+    fetch('https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/prediction', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ CurrentDay: { totalEnergy } })
