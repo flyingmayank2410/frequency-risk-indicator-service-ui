@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from "recharts";
 import PredictionChart from "./PredictionChart";
-import styles from "./styles";
 
 function hourToLabel(time) {
   const d = new Date(time);
@@ -38,7 +37,7 @@ function makeChartData(dayData) {
       totalPower: totalMap[t]?.power,
       demandEnergy: demandMap[t]?.value ?? 0,
       demandVoltage: demandMap[t]?.voltage,
-      demandPower: demandMap[t]?.power
+      demandPower: demandMap[t]?.power,
     };
   });
 }
@@ -48,26 +47,36 @@ function EnergyChart({ data, dataKey, voltageKey, powerKey, stroke, name }) {
   const [showPower, setShowPower] = useState(false);
 
   return (
-    <div style={styles.chartPanel}>
-      <h4 style={styles.chartTitle}>{name}</h4>
+    <div style={{
+      background: '#111',
+      borderRadius: 10,
+      padding: 20,
+      marginBottom: 14,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.26)'
+    }}>
+      <h4 style={{ margin: 0, marginBottom: 8, color: '#fff' }}>{name}</h4>
       <div style={{ marginBottom: 10 }}>
-        <label style={{ color: '#eee', marginRight: 12 }}>
+        <label style={{ color: '#fff', marginRight: 12 }}>
           <input type="checkbox" checked={showVoltage} onChange={() => setShowVoltage(v => !v)} /> Voltage
         </label>
-        <label style={{ color: '#eee' }}>
+        <label style={{ color: '#fff' }}>
           <input type="checkbox" checked={showPower} onChange={() => setShowPower(p => !p)} /> Power
         </label>
       </div>
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={data}>
-          <XAxis dataKey="time" tick={{ fill: '#eee', fontSize: 12 }} />
-          <YAxis tick={{ fill: '#eee' }} />
-          <CartesianGrid stroke="#444" />
+          <XAxis dataKey="time" tick={{ fill: '#fff', fontSize: 10 }} />
+          <YAxis tick={{ fill: '#fff' }} />
+          <CartesianGrid stroke="#333" />
           <Tooltip />
-          <Legend wrapperStyle={styles.legend} />
-          <Line type="monotone" dataKey={dataKey} name={name} stroke={stroke} strokeWidth={3} dot={false} />
-          {voltageKey && showVoltage && <Line type="monotone" dataKey={voltageKey} name="Voltage" stroke="#fbc02d" strokeWidth={2} dot={false} />}
-          {powerKey && showPower && <Line type="monotone" dataKey={powerKey} name="Power" stroke="#ff5722" strokeWidth={2} dot={false} />}
+          <Legend />
+          <Line type="monotone" dataKey={dataKey} name={name} stroke={stroke} strokeWidth={2} dot={false} />
+          {voltageKey && showVoltage && (
+            <Line type="monotone" dataKey={voltageKey} name="Voltage" stroke="#fbc02d" strokeWidth={2} dot={false} />
+          )}
+          {powerKey && showPower && (
+            <Line type="monotone" dataKey={powerKey} name="Power" stroke="#ff5722" strokeWidth={2} dot={false} />
+          )}
         </LineChart>
       </ResponsiveContainer>
     </div>
@@ -76,7 +85,7 @@ function EnergyChart({ data, dataKey, voltageKey, powerKey, stroke, name }) {
 
 function GraphSection({ locationId }) {
   const [graph, setGraph] = useState(null);
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState('');
 
   useEffect(() => {
     if (!locationId) return;
@@ -84,7 +93,7 @@ function GraphSection({ locationId }) {
     fetch(`https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/graph?locationId=${locationId}&days=3`)
       .then(r => r.json())
       .then(response => {
-        if (response && response.data && typeof response.data === "object") {
+        if (response && response.data && typeof response.data === 'object') {
           setGraph(response.data);
           const dates = Object.keys(response.data).sort();
           if (dates.length > 0 && !selectedDate) {
@@ -97,15 +106,81 @@ function GraphSection({ locationId }) {
       .catch(() => setGraph(null));
   }, [locationId]);
 
-  if (!graph) return <div style={{ color: "#eee" }}>Loading...</div>;
+  if (!graph) return <div style={{ color: '#fff' }}>Loading...</div>;
 
   const dayData = graph[selectedDate] || {};
   const chartData = makeChartData(dayData);
 
   return (
-    <>
-      <h3 style={{ color: "#eee" }}>Energy Graphs for {selectedDate || "Date"}</h3>
-      <div style={{ marginBottom: 16 }}>
-        <label style={{ color: "#eee", marginRight: 12 }}>
+    <div>
+      <h3 style={{ color: '#fff' }}>Energy Graphs for {selectedDate || 'Date'}</h3>
+      <div style={{ marginBottom: 12 }}>
+        <label style={{ color: '#fff', marginRight: 12 }}>
           Select Date:
           <select
+            value={selectedDate}
+            onChange={e => setSelectedDate(e.target.value)}
+            style={{
+              fontSize: '1em',
+              color: '#fff',
+              background: '#333',
+              border: '1px solid #555',
+              borderRadius: 4,
+              padding: '2px 4px',
+              marginLeft: 8
+            }}
+          >
+            {Object.keys(graph).sort().map(date => (
+              <option key={date} value={date}>{date}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ flex: '1 1 calc(50% - 16px)', minWidth: 0 }}>
+          <EnergyChart
+            data={chartData}
+            dataKey="solarEnergy"
+            voltageKey="solarVoltage"
+            powerKey="solarPower"
+            stroke="#ff9800"
+            name="Solar Energy"
+          />
+        </div>
+        <div style={{ flex: '1 1 calc(50% - 16px)', minWidth: 0 }}>
+          <EnergyChart
+            data={chartData}
+            dataKey="windEnergy"
+            voltageKey="windVoltage"
+            powerKey="windPower"
+            stroke="#03a9f4"
+            name="Wind Energy"
+          />
+        </div>
+        <div style={{ flex: '1 1 calc(50% - 16px)', minWidth: 0 }}>
+          <EnergyChart
+            data={chartData}
+            dataKey="totalEnergy"
+            voltageKey="totalVoltage"
+            powerKey="totalPower"
+            stroke="#4caf50"
+            name="Total Energy"
+          />
+        </div>
+        <div style={{ flex: '1 1 calc(50% - 16px)', minWidth: 0 }}>
+          <EnergyChart
+            data={chartData}
+            dataKey="demandEnergy"
+            voltageKey="demandVoltage"
+            powerKey="demandPower"
+            stroke="#e91e63"
+            name="Demand Energy"
+          />
+        </div>
+      </div>
+      <PredictionChart totalEnergy={dayData.totalEnergy || []} />
+    </div>
+  );
+}
+
+export default GraphSection;
