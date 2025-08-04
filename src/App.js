@@ -3,8 +3,7 @@ import LocationTree from "./LocationTree";
 import LocationForm from "./LocationForm";
 import SwitchgearForm from "./SwitchgearForm";
 import GraphSection from "./GraphSection";
-import SwgTypeInfo from "./SwgTypeInfo";
-import FeederTypeInfo from "./FeederTypeInfo";
+import CombinedInfoPanels from "./CombinedInfoPanels";
 
 function App() {
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -37,7 +36,6 @@ function App() {
     setSelectedSwitchgear(null);
   }
 
-  // Accepts new/updated location data and updates selection after create
   function handleLocationFormRefresh(newLocationData) {
     if (newLocationData && newLocationData.id) {
       setSelectedLocation(newLocationData);
@@ -56,7 +54,7 @@ function App() {
 
   function onDrag(e) {
     if (dragging.current) {
-      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      const x = e.touches ? e.touches.clientX : e.clientX;
       const newWidth = Math.max(200, Math.min(x, 600));
       setPanelWidth(newWidth);
     }
@@ -184,20 +182,17 @@ function App() {
           minWidth: 0
         }}
       >
-        {/* Show cards and message only if nothing is selected */}
+        {/* Show combined info panels and message only when no location/form/switchgear is selected */}
         {!selectedLocation && !showLocationForm && !selectedSwitchgear && (
           <>
-            <div style={{ display: "flex", gap: 20, marginBottom: 12 }}>
-              <SwgTypeInfo />
-              <FeederTypeInfo />
-            </div>
+            <CombinedInfoPanels />
             <div style={{ color: "#888", fontSize: 16, textAlign: "center", marginTop: 8 }}>
               No Location Selected
             </div>
           </>
         )}
 
-        {/* Show Graph section if location selected */}
+        {/* Show graph section when location selected */}
         {selectedLocation && !showLocationForm && !selectedSwitchgear && (
           <>
             <div
@@ -245,7 +240,6 @@ function App() {
                 </button>
               </div>
             </div>
-            {/* Pass correct locationId (never undefined): */}
             <GraphSection locationId={selectedLocation.id} />
           </>
         )}
@@ -254,7 +248,7 @@ function App() {
         {showLocationForm && (
           <LocationForm
             location={selectedLocation}
-            onRefresh={handleLocationFormRefresh} // passes back location data after create
+            onRefresh={handleLocationFormRefresh}
             onAddSwitchgear={handleAddSwitchgear}
             onCancel={handleCancelForm}
           />
