@@ -7,7 +7,7 @@ function hourToLabel(time) {
   return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 }
 
-// Create flat chart data with per-series voltage and power per hour
+// Prepare chart data with per-panel voltage and power keys
 function makeChartData(dayData) {
   if (!dayData) return [];
   const allTimes = [
@@ -43,7 +43,7 @@ function makeChartData(dayData) {
   });
 }
 
-// Each chart panel: energy, voltage (yellow), power (orange); toggles for voltage/power
+// Chart component: energy line, togglable voltage (yellow) & power (orange) lines, all unique per panel
 function EnergyChart({ data, dataKey, voltageKey, powerKey, stroke, name }) {
   const [showVoltage, setShowVoltage] = useState(true);
   const [showPower, setShowPower] = useState(false);
@@ -166,6 +166,7 @@ function GraphSection({ locationId }) {
           />
         </div>
       </div>
+      <PredictionChart totalEnergy={dayData.totalEnergy || []} />
     </div>
   );
 }
