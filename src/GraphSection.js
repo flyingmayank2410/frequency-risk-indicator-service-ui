@@ -7,7 +7,7 @@ function hourToLabel(time) {
   return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 }
 
-// Prepare merged chart data per hour with per-series voltage/frequency
+// Create flat chart data with per-series voltage and power per hour
 function makeChartData(dayData) {
   if (!dayData) return [];
   const allTimes = [
@@ -29,24 +29,24 @@ function makeChartData(dayData) {
       time: t,
       solarEnergy: solarMap[t]?.value ?? 0,
       solarVoltage: solarMap[t]?.voltage,
-      solarFrequency: solarMap[t]?.frequency,
+      solarPower: solarMap[t]?.power,
       windEnergy: windMap[t]?.value ?? 0,
       windVoltage: windMap[t]?.voltage,
-      windFrequency: windMap[t]?.frequency,
+      windPower: windMap[t]?.power,
       totalEnergy: totalMap[t]?.value ?? 0,
       totalVoltage: totalMap[t]?.voltage,
-      totalFrequency: totalMap[t]?.frequency,
+      totalPower: totalMap[t]?.power,
       demandEnergy: demandMap[t]?.value ?? 0,
       demandVoltage: demandMap[t]?.voltage,
-      demandFrequency: demandMap[t]?.frequency
+      demandPower: demandMap[t]?.power
     };
   });
 }
 
-// One chart with toggles for voltage/frequency per panel
-function EnergyChart({ data, dataKey, voltageKey, frequencyKey, stroke, name }) {
+// Each chart panel: energy, voltage (yellow), power (orange); toggles for voltage/power
+function EnergyChart({ data, dataKey, voltageKey, powerKey, stroke, name }) {
   const [showVoltage, setShowVoltage] = useState(true);
-  const [showFrequency, setShowFrequency] = useState(true);
+  const [showPower, setShowPower] = useState(false);
 
   return (
     <div style={{ background: '#111', borderRadius: 10, padding: 20, marginBottom: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.26)' }}>
@@ -56,7 +56,7 @@ function EnergyChart({ data, dataKey, voltageKey, frequencyKey, stroke, name }) 
           <input type="checkbox" checked={showVoltage} onChange={() => setShowVoltage(v => !v)} /> Voltage
         </label>
         <label style={{ color: '#fff' }}>
-          <input type="checkbox" checked={showFrequency} onChange={() => setShowFrequency(f => !f)} /> Frequency
+          <input type="checkbox" checked={showPower} onChange={() => setShowPower(p => !p)} /> Power
         </label>
       </div>
       <ResponsiveContainer width="100%" height={200}>
@@ -70,8 +70,8 @@ function EnergyChart({ data, dataKey, voltageKey, frequencyKey, stroke, name }) 
           {voltageKey && showVoltage && (
             <Line type="monotone" dataKey={voltageKey} name="Voltage" stroke="#fbc02d" strokeWidth={2} dot={false} />
           )}
-          {frequencyKey && showFrequency && (
-            <Line type="monotone" dataKey={frequencyKey} name="Frequency" stroke="#9c27b0" strokeWidth={2} dot={false} />
+          {powerKey && showPower && (
+            <Line type="monotone" dataKey={powerKey} name="Power" stroke="#ff5722" strokeWidth={2} dot={false} />
           )}
         </LineChart>
       </ResponsiveContainer>
@@ -130,7 +130,7 @@ function GraphSection({ locationId }) {
             data={chartData}
             dataKey="solarEnergy"
             voltageKey="solarVoltage"
-            frequencyKey="solarFrequency"
+            powerKey="solarPower"
             stroke="#ff9800"
             name="Solar Energy"
           />
@@ -140,7 +140,7 @@ function GraphSection({ locationId }) {
             data={chartData}
             dataKey="windEnergy"
             voltageKey="windVoltage"
-            frequencyKey="windFrequency"
+            powerKey="windPower"
             stroke="#03a9f4"
             name="Wind Energy"
           />
@@ -150,7 +150,7 @@ function GraphSection({ locationId }) {
             data={chartData}
             dataKey="totalEnergy"
             voltageKey="totalVoltage"
-            frequencyKey="totalFrequency"
+            powerKey="totalPower"
             stroke="#4caf50"
             name="Total Energy"
           />
@@ -160,7 +160,7 @@ function GraphSection({ locationId }) {
             data={chartData}
             dataKey="demandEnergy"
             voltageKey="demandVoltage"
-            frequencyKey="demandFrequency"
+            powerKey="demandPower"
             stroke="#e91e63"
             name="Demand Energy"
           />
