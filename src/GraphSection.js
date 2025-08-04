@@ -3,6 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend
 } from "recharts";
 import PredictionChart from "./PredictionChart";
+import FrequencyScatterPlot from "./FrequencyScatterPlot"; // <-- your scatter chart
 
 function hourToLabel(time) {
   const d = new Date(time);
@@ -52,6 +53,7 @@ function EnergyChart({ data, dataKey, stroke, name }) {
 function GraphSection({ locationId }) {
   const [graph, setGraph] = useState(null);
   const [selectedDate, setSelectedDate] = useState('');
+  const [frequencyData, setFrequencyData] = useState([]); // for scatter plot
 
   useEffect(() => {
     if (!locationId) return;
@@ -72,6 +74,18 @@ function GraphSection({ locationId }) {
       .catch(() => setGraph(null));
   }, [locationId]);
 
+  // Fetch your new frequency API data per requirements, update these URLs/params as needed:
+  useEffect(() => {
+    if (!locationId) return;
+    fetch(`https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/prediction-frequency?locationId=${locationId}&day=${selectedDate}`)
+      .then(r => r.json())
+      .then(res => {
+        if (res && res.data && Array.isArray(res.data)) setFrequencyData(res.data);
+        else setFrequencyData([]);
+      })
+      .catch(() => setFrequencyData([]));
+  }, [locationId, selectedDate]);
+
   if (!graph) return <div style={{ color: '#fff' }}>Loading...</div>;
 
   const dayData = graph[selectedDate] || {};
@@ -84,7 +98,7 @@ function GraphSection({ locationId }) {
         <h3 style={{ color: '#fff' }}>Energy Graphs for {selectedDate || 'Date'}</h3>
         <div style={{ marginBottom: 12 }}>
           <label style={{ color: '#fff' }}>
-            Date:
+            Select Date:
             <select
               value={selectedDate}
               onChange={e => setSelectedDate(e.target.value)}
@@ -111,7 +125,14 @@ function GraphSection({ locationId }) {
           </div>
         </div>
       </div>
-      {predictionInput.length > 0 && <PredictionChart totalEnergy={predictionInput} />}
+
+      {/* Render prediction chart for totalEnergy */}
+      <PredictionChart totalEnergy={predictionInput} />
+
+      {/* Render frequency scatter plot from frequency prediction API */}
+      {frequencyData.length > 0 && (
+        <FrequencyScatterPlot data={frequencyData} />
+      )}
     </>
   );
 }
