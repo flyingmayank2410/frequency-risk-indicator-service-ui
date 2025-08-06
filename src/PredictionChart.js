@@ -80,8 +80,8 @@ function PredictionChart({ totalEnergy }) {
       <ResponsiveContainer width='100%' height={400}>
         <ScatterChart margin={{ top: 20, right:20, bottom: 20, left: 20 }}>
           <CartesianGrid stroke='#333' />
-          <XAxis type='number' dataKey='rocOfFreq' name='Rate of Change of Frequency' unit='Hz/s' />
-          <YAxis type='category' dataKey='istTime' name='Time (IST)' interval={0} tick={{ fill: '#fff' }} />
+          <YAxis type='number' dataKey='rocOfFreq' name='Rate of Change of Frequency' unit='Hz/s' />
+          <XAxis type='category' dataKey='istTime' name='Time (IST)' interval={0} tick={{ fill: '#fff' }} />
           <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
           <Scatter
             name='Frequency Change'
