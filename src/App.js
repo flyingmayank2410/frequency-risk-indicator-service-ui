@@ -12,6 +12,33 @@ function App() {
   const [showLocationForm, setShowLocationForm] = useState(false);
   const [refresh, setRefresh] = useState(false);
 
+  // Button handlers for location and switchgear
+  function handleEditLocation() {
+    setShowLocationForm(true);
+    setSelectedSwitchgear(null);
+  }
+  function handleAddSwitchgear() {
+    setShowLocationForm(false);
+    setSelectedSwitchgear({ locationId: selectedLocation?.id });
+  }
+  function handleCancelForm() {
+    setShowLocationForm(false);
+    setSelectedSwitchgear(null);
+  }
+  function handleLocationFormRefresh(newLocationData) {
+    if (newLocationData && newLocationData.id) {
+      setSelectedLocation(newLocationData);
+    }
+    setShowLocationForm(false);
+    setSelectedSwitchgear(null);
+    setRefresh(r => !r);
+  }
+  function handleTreeRefresh() {
+    setRefresh(r => !r);
+    setShowLocationForm(false);
+    setSelectedSwitchgear(null);
+  }
+
   return (
     <div style={styles.appContainer}>
       <aside style={styles.sidebar}>
@@ -57,23 +84,81 @@ function App() {
             </div>
           </>
         )}
+
         {selectedLocation && !showLocationForm && !selectedSwitchgear && (
           <>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 22,
+                background: "#23272f",
+                borderRadius: 14,
+                padding: "18px 22px",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.22)"
+              }}
+            >
+              <h3 style={{ margin: 0, color: "#97aaff", fontWeight: 800, fontSize: 23 }}>
+                {selectedLocation.locationName || "Current Location"}
+              </h3>
+              <div>
+                <button
+                  onClick={handleEditLocation}
+                  style={{
+                    marginRight: 12,
+                    padding: "10px 22px",
+                    background: "#4caf50",
+                    color: "#fff",
+                    borderRadius: 8,
+                    border: "none",
+                    fontWeight: "bold",
+                    fontSize: 16,
+                    marginLeft: 8,
+                    boxShadow: "0 2px 8px rgba(80,170,255,0.19)",
+                    cursor: "pointer",
+                    letterSpacing: "0.04em"
+                  }}
+                >
+                  Edit Location
+                </button>
+                <button
+                  onClick={handleAddSwitchgear}
+                  style={{
+                    padding: "10px 22px",
+                    background: "#50aaff",
+                    color: "#fff",
+                    borderRadius: 8,
+                    border: "none",
+                    fontWeight: "bold",
+                    fontSize: 16,
+                    marginLeft: 4,
+                    boxShadow: "0 2px 8px rgba(76, 175, 255, 0.12)",
+                    cursor: "pointer",
+                    letterSpacing: "0.03em"
+                  }}
+                >
+                  + Add Switchgear
+                </button>
+              </div>
+            </div>
             <GraphSection locationId={selectedLocation.id} />
           </>
         )}
+
         {showLocationForm && (
           <LocationForm
             location={selectedLocation}
-            onRefresh={() => setRefresh(r => !r)}
-            onAddSwitchgear={() => setSelectedSwitchgear({ locationId: selectedLocation?.id })}
-            onCancel={() => setShowLocationForm(false)}
+            onRefresh={handleLocationFormRefresh}
+            onAddSwitchgear={handleAddSwitchgear}
+            onCancel={handleCancelForm}
           />
         )}
+
         {selectedSwitchgear && (
           <SwitchgearForm
             switchgear={selectedSwitchgear}
-            onRefresh={() => setRefresh(r => !r)}
+            onRefresh={handleTreeRefresh}
             onBack={() => setSelectedSwitchgear(null)}
           />
         )}
