@@ -36,12 +36,10 @@ function PredictionChart({ totalEnergy }) {
       setData(null);
       return;
     }
-
     setLoading(true);
     setError(null);
 
-    // Call the correct prediction API for frequency data
-    fetch('https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/prediction', {
+    fetch('https://frequency-risk-detection-inertia-control-production.up.railway.app/api/v1/frequency-prediction', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ CurrentDay: { totalEnergy } })
@@ -49,10 +47,14 @@ function PredictionChart({ totalEnergy }) {
       .then(res => res.json())
       .then(resData => {
         if (resData && resData.status === 200 && Array.isArray(resData.data)) {
-          // Data matches required format
+          // Add color for red points if either flag is true
           const chartData = resData.data.map(item => ({
             ...item,
-            istTime: formatTimeToIST(item.timestamp)  // to be used for Y-Axis
+            istTime: formatTimeToIST(item.timestamp),
+            color:
+              item.syntheticInertiaRequired || item.triggerControlCommand
+                ? '#f44336' // Red highlight
+                : '#50aaff' // Default blue
           }));
           setData(chartData);
         } else {
@@ -61,8 +63,7 @@ function PredictionChart({ totalEnergy }) {
         }
         setLoading(false);
       })
-      .catch((e) => {
-        console.error(e);
+      .catch(() => {
         setError('Failed to fetch prediction data');
         setData(null);
         setLoading(false);
@@ -79,10 +80,24 @@ function PredictionChart({ totalEnergy }) {
       <ResponsiveContainer width='100%' height={400}>
         <ScatterChart margin={{ top: 20, right:20, bottom: 20, left: 20 }}>
           <CartesianGrid stroke='#333' />
-          <YAxis type='number' dataKey='rocOfFreq' name='Rate of Change of Frequency' unit='Hz/s' />
-          <XAxis type='category' dataKey='istTime' name='Time (IST)' interval={0} tick={{ fill: '#fff' }} />
+          <XAxis type='number' dataKey='rocOfFreq' name='Rate of Change of Frequency' unit='Hz/s' />
+          <YAxis type='category' dataKey='istTime' name='Time (IST)' interval={0} tick={{ fill: '#fff' }} />
           <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
-          <Scatter name='Frequency Change' data={data} fill='#50aaff' />
+          <Scatter
+            name='Frequency Change'
+            data={data}
+            fill='#50aaff'
+            // Custom color per point (red where required)
+            shape={(props) => (
+              <circle
+                {...props}
+                r={6}
+                fill={props.payload.color}
+                stroke="#fff"
+                strokeWidth={props.payload.color === "#f44336" ? 3 : 0}
+              />
+            )}
+          />
         </ScatterChart>
       </ResponsiveContainer>
     </div>
